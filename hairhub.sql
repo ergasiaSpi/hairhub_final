@@ -37,6 +37,17 @@ CREATE TABLE Services (
     duration INT NOT NULL -- διάρκεια σε λεπτά
 );
 
+CREATE TABLE AvailabilitybyStylist (
+    stylist_id INT PRIMARY KEY NOT NULL,
+    availability_id INT AUTO_INCREMENT ,
+    appoint_date DATE NOT NULL,
+    time_start TIME NOT NULL,
+    time_end TIME NOT NULL,
+    FOREIGN KEY (stylist_id) REFERENCES Stylists(stylist_id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
 CREATE TABLE Appointments (
     appointment_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -78,13 +89,4 @@ CREATE TABLE Reviews (
     ON UPDATE CASCADE
 );
 
-CREATE TABLE AvailabilitybyStylist (
-    stylist_id INT PRIMARY KEY NOT NULL,
-    availability_id INT AUTO_INCREMENT ,
-    appoint_date DATE NOT NULL,
-    time_start TIME NOT NULL,
-    time_end TIME NOT NULL,
-    FOREIGN KEY (stylist_id) REFERENCES Stylists(stylist_id)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
-);
+
