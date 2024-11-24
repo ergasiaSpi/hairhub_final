@@ -10,11 +10,12 @@ CREATE TABLE Users (
 CREATE TABLE Salons (
     salon_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    salon_address VARCHAR(100),
-    phone VARCHAR(15),
+    address VARCHAR(255) NOT NULL,
+    location VARCHAR(100) NOT NULL,
+    phone_number VARCHAR(15) NOT NULL,
     email VARCHAR(100),
-    open_time TIME NOT NULL,
-    close_time TIME NOT NULL
+    rating DECIMAL(2, 1),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE Stylists (
