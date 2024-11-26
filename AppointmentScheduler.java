@@ -6,10 +6,10 @@ import java.sql.Statement;
 
 public class AppointmentScheduler {
 
-    // Διαδρομή για τη βάση SQLite
+
     private static final String DB_URL = "jdbc:sqlite:salon.db";
 
-    // Μέθοδος σύνδεσης με τη βάση δεδομένων
+    
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(DB_URL);
     }
