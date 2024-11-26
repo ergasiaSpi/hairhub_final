@@ -61,7 +61,7 @@ public class AppointmentScheduler {
    } catch (SQLException e) {
        e.printStackTrace();
    }
-        return -1; // Αν η υπηρεσία δεν βρεθεί
+        return -1; 
     }
 
     // Υπολογισμός ώρας λήξης
