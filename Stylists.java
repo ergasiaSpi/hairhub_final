@@ -2,9 +2,9 @@ import java.sql.*;
 
 public class StylistDatabaseConnection {
         
-        String DB_URL = "jdbc:mysql://localhost:3306/DESKTOP-3G41IC8";
+        String DB_URL = "jdbc:mysql://localhost:3306/";
         String USER = "root";
-        String PASSWORD = "458@GTAqv2004";
+        String PASSWORD = "";
 
 
 public void addStylist(int stylistId, String stylistName, int salonId, String specializations, String shiftStart, String shiftEnd) {
