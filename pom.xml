@@ -4,11 +4,11 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>ergasia_spineli</groupId>
-  <artifactId>ergasia_spineli</artifactId>
+  <groupId>com.Hairhub.Sign_in_up</groupId>
+  <artifactId>com.Hairhub.Sign_in_up</artifactId>
   <version>0.0.1</version>
 
-  <name>ergasia_spineli</name>
+  <name>com.Hairhub.Sign_in_up</name>
   <!-- FIXME change it to the project's website -->
   <url>http://www.example.com</url>
 
