@@ -1,3 +1,5 @@
+package com.Hairhub.Sign_in_up;
+
 import java.util.Scanner;
 
 public class Log_in {
