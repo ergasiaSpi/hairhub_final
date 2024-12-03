@@ -1,4 +1,4 @@
-package ergasia_spineli;
+package com.Hairhub.Sign_in_up;
 
 import java.sql.*;
 
