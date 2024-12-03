@@ -1,5 +1,3 @@
-package ergasia_spineli;
-
 import java.util.Scanner;
 
 public class Log_in {
