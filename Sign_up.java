@@ -1,4 +1,5 @@
-package com.Hairhub.Sign_in_up;
+package com.Hairhub.sign_in_up;
+
 import java.util.Scanner;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
