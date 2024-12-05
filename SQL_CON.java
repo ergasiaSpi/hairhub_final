@@ -1,4 +1,4 @@
-package com.Hairhub.Sign_in_up;
+package com.Hairhub.sign_in_up;
 
 import java.sql.*;
 
