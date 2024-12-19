@@ -4,7 +4,8 @@ CREATE TABLE Users (
     email VARCHAR(100) UNIQUE NOT NULL,
     phone VARCHAR(15),
     user_password VARCHAR(255) NOT NULL,
-    role ENUM('admin', 'customer') NOT NULL
+    role VARCHAR(10) NOT NULL CHECK (role IN('customer', 'admin'))
+    DEFAULT 'customer'
 );
 
 CREATE TABLE Salons (
@@ -40,7 +41,8 @@ CREATE TABLE Services (
 
 CREATE TABLE AvailabilitybyStylist (
     stylist_id INT PRIMARY KEY NOT NULL,
-    availability_id INT AUTO_INCREMENT ,
+    availability_id INT AUTO_INCREMENT 
+    ON DELETE CASCADE,
     appoint_date DATE NOT NULL,
     time_start TIME NOT NULL,
     time_end TIME NOT NULL,
@@ -50,14 +52,14 @@ CREATE TABLE AvailabilitybyStylist (
 );
 
 CREATE TABLE Appointments (
-    appointment_id INT AUTO_INCREMENT PRIMARY KEY,
+    appointment_id INT AUTO_INCREMENT PRIMARY KEY ,
     user_id INT NOT NULL,
     salon_id INT NOT NULL,
     stylist_id INT NOT NULL,
     service_id INT NOT NULL,
     date DATE NOT NULL,
     time_start TIME NOT NULL,
-    status ENUM('pending', 'confirmed', 'canceled') DEFAULT 'pending',
+    status VARCHAR(10) NOT NULL CHECK('pending', 'confirmed', 'canceled') DEFAULT 'pending',
     FOREIGN KEY (user_id) REFERENCES Users(user_id)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
