@@ -2,7 +2,7 @@ package com.hairhub.sign_in_up;
 
 import java.util.Scanner;
 
-public class Log_in {
+public class Sign_in_MAIN {
 
     private static Scanner input = new Scanner(System.in);
 
