@@ -6,7 +6,7 @@ CREATE TABLE Users (
     user_password TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     phone TEXT NOT NULL,
-    Postal_Code INTEGER NOT NULL,
+    zipcode INTEGER NOT NULL,
     role TEXT CHECK (role IN ('admin', 'customer'))
 );
 
