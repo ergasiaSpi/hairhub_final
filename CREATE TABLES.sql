@@ -7,18 +7,26 @@ CREATE TABLE Users (
     email TEXT UNIQUE NOT NULL,
     phone TEXT NOT NULL,
     Postal_Code INTEGER NOT NULL,
-    role TEXT 
+    role TEXT CHECK (role IN ('admin', 'customer'))
 );
 
 CREATE TABLE Salons (
     salon_id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     address TEXT NOT NULL,
-    location TEXT NOT NULL,
+    zipcode TEXT NOT NULL,
     phone_number TEXT NOT NULL,
     email TEXT,
     rating REAL CHECK (rating BETWEEN 1 AND 5),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (zipcode) REFERENCES Location(zipcode) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE Location (
+    zipcode TEXT PRIMARY KEY,
+    territory TEXT NOT NULL,
+    longtitude REAL NOT NULL,
+    latitude REAL NOT NULL
 );
 
 CREATE TABLE Stylists (
