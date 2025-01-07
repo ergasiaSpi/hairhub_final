@@ -44,7 +44,7 @@ CREATE TABLE Services (
     service TEXT NOT NULL,
     service_type TEXT,
     price REAL NOT NULL,
-    duration INTEGER NOT NULL -- σε λεπτά
+    duration TIME NOT NULL -- σε λεπτά
 );
 
 CREATE TABLE AvailabilitybyStylist (
