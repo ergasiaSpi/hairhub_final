@@ -1,16 +1,15 @@
+ 
 import java.sql.*;
-
 public class StylistDatabaseConnection {
-        
-        String DB_URL = "jdbc:mysql://localhost:3306/";
-        String USER = "root";
-        String PASSWORD = "";
+    String DB_URL ="jdbc:sqlserver://DESKTOP-HRTROUG:1433;databaseName=ERG-SPI;integratedSecurity=true";
+
+     
 
 
 public void addStylist(int stylistId, String stylistName, int salonId, String specializations, String shiftStart, String shiftEnd) {
-    String INSERT_SQL = "INSERT INTO Stylists (stylist_id, stylist_name, salon_id, specializations, shift_start, shift_end) VALUES (?, ?, ?, ?, ?, ?)";
+    String INSERT_SQL = "INSERT INTO Stylists(stylist_id, stylist_name, salon_id, specializations, shift_start, shift_end) VALUES (?, ?, ?, ?, ?, ?)";
 
-    try (Connection connection = DriverManager.getConnection(DB_URL, USER, PASSWORD);
+    try (Connection connection = DriverManager.getConnection(DB_URL);
          PreparedStatement preparedStatement = connection.prepareStatement(INSERT_SQL)) {
 
       
