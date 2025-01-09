@@ -67,11 +67,13 @@ public class AppointmentScheduler {
     // Main
     public static void main(String[] args) {
         AppointmentScheduler scheduler = new AppointmentScheduler();
-        
+
+        //Επιλογή Salon
         Scanner scanner = new Scanner(System.in);
         System.out.println("Δάλεξε το salon που επιθυμείς:");
         int salonId = scanner.nextInt();
-        
+
+        // Εύρεση stylists του συγκεκριμένου salon
         List<String> stylists = getStylistsBySalonId(salonId);
 
         System.out.println("Stylists για το Salon ID " + salonId + ":");
@@ -80,6 +82,7 @@ public class AppointmentScheduler {
             System.out.println((i + 1) + ". " + stylists.get(i));
         }
 
+        //Επιλογή stylist
         System.out.println("Διάλεξε έναν αριθμό από τη λίστα:");
         int choice = scanner.nextInt();
 
@@ -91,7 +94,7 @@ public class AppointmentScheduler {
         
         scanner.close();
         
-    
+        //Κλείσιμο Ραντεβού
         boolean success = scheduler.bookAppointment( userId, salonId, stylistId, serviceId, date, timeStart, timeEnd);
 
         if (success) {
