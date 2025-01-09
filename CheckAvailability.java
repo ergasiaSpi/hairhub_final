@@ -30,9 +30,9 @@ public class CheckAvailability {
         LocalTime serviceDuration = getServiceDuration(serviceType);
 
         // Υπολογισμός διαθέσιμων slots
-        List<String> availableTimes = calculateAvailableSlots(stylistShift, bookedSlots, serviceDuration);
+        List<String> optimalSlots = calculateOptimalSlots(stylistShift, bookedSlots, serviceDuration);
 
-        return availableTimes;
+        return optimalSlots;
     }
 
     //Μέθοδος για εύρεση του shift του στυλίστα
@@ -93,16 +93,34 @@ public class CheckAvailability {
 
     //Μέθοδος για υπολογισμό διαθέσιμων slots
      
-    private List<String> calculateAvailableSlots(TimeSlot shift, List<TimeSlot> bookedSlots, LocalTime serviceDuration) {
-        List<String> availableTimes = new ArrayList<>();
+    private List<String> calculateOptimalSlots(TimeSlot shift, List<TimeSlot> bookedSlots, LocalTime serviceDuration) {
+        List<String> optimalSlots = new ArrayList<>();
         LocalTime currentTime = shift.getStart();
-    
-        // Calculate the service duration in minutes
+
         int serviceDurationMinutes = serviceDuration.toSecondOfDay() / 60;
 
-    while (currentTime.plusMinutes(serviceDurationMinutes).isBefore(shift.getEnd()) || 
-           currentTime.plusMinutes(serviceDurationMinutes).equals(shift.getEnd())) {
-        TimeSlot candidateSlot = new TimeSlot(currentTime, currentTime.plusMinutes(serviceDurationMinutes));
+        // Βοηθητική μέθοδος backtracking
+        backtrack(currentTime, shift.getEnd(), serviceDurationMinutes, bookedSlots, new ArrayList<>(), optimalSlots);
+
+        return optimalSlots;
+    }
+
+    private void backtrack(LocalTime currentTime, LocalTime shiftEnd, int serviceDuration, List<TimeSlot> bookedSlots,
+                           List<LocalTime> currentCombination, List<String> optimalSlots) {
+        // Αν έχουμε περάσει το τέλος της βάρδιας, σταματάμε
+        if (currentTime.plusMinutes(serviceDuration).isAfter(shiftEnd)) {
+            // Υπολογισμός της "ποιότητας" του συνδυασμού
+            if (currentCombination.size() > optimalSlots.size()) {
+                optimalSlots.clear();
+                for (LocalTime time : currentCombination) {
+                    optimalSlots.add(time.toString());
+                }
+            }
+            return;
+        }
+
+        // Δημιουργία υποψήφιου slot
+        TimeSlot candidateSlot = new TimeSlot(currentTime, currentTime.plusMinutes(serviceDuration));
         boolean isAvailable = true;
 
         for (TimeSlot bookedSlot : bookedSlots) {
@@ -112,14 +130,19 @@ public class CheckAvailability {
             }
         }
 
+        // Αν το slot είναι διαθέσιμο, προσθέτουμε στη λίστα
         if (isAvailable) {
-            availableTimes.add(currentTime.toString());
+            currentCombination.add(currentTime);
+
+            // Προχωράμε στο επόμενο slot
+            backtrack(currentTime.plusMinutes(serviceDuration), shiftEnd, serviceDuration, bookedSlots, currentCombination, optimalSlots);
+
+            // Backtrack: αφαιρούμε το τελευταίο slot
+            currentCombination.remove(currentCombination.size() - 1);
         }
 
-        currentTime = currentTime.plusMinutes(serviceDurationMinutes); // Increment by service duration
-    }
-
-    return availableTimes;
+        // Προχωράμε στο επόμενο slot ανεξάρτητα από τη διαθεσιμότητα
+        backtrack(currentTime.plusMinutes(serviceDuration), shiftEnd, serviceDuration, bookedSlots, currentCombination, optimalSlots);
     }  
 
     public void close() throws SQLException {
@@ -150,3 +173,4 @@ public class CheckAvailability {
         }
     }
 }
+    
