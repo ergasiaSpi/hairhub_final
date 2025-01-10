@@ -8,15 +8,15 @@ public class AppointmentScheduler {
 
     private Connection connection;
 
-    //Σύνδεση με ΒΔ
+    
     public AppointmentScheduler(String db) throws SQLException {
         connection =  DriverManager.getConnection(db);
     }
 
-    // Μέθοδος για κλείσιμο ραντεβού
+  
     public boolean bookAppointment(int userId, int salonId, int stylistId, int serviceId, date date, time timeStart, time timeEnd) {
         
-        // Εισαγωγή του ραντεβού στον πίνακα Appointments
+        
         String query = "INSERT INTO Appointments (user_id, salon_id, stylist_id, service_id, date, time_start, time_end) " +
                        "VALUES (" + userId + ", " + salonId + ", " + stylistId + ", " + serviceId + ", " + date + ", " + timeStart + ", " + timeEnd )";
         try (Connection conn = getConnection();
@@ -63,12 +63,10 @@ public class AppointmentScheduler {
     }
 
 
-    
-    // Main
-    public static void main(String[] args) {
+       public static void main(String[] args) {
         AppointmentScheduler scheduler = new AppointmentScheduler();
 
-        // Εισαγωγή περιοχής για εύρεση των διαθέσιμων salons
+      
         Scanner scanner = new Scanner(System.in);
         System.out.println("Ψάχνεις για salon σε ποια περιοχή:");
         String location = scanner.next();
@@ -79,13 +77,12 @@ public class AppointmentScheduler {
         for (int i = 0; i < salonsList.size(); i++) {
         	System.out.println(salonsList.get(i).getSalonId() + " - " + salonsList.get(i).getName() + " - " + salonsList.get(i).getPhoneNumber());
         }
-        
-        //Επιλογή Salon
+       
         scanner = new Scanner(System.in);
         System.out.println("Δάλεξε το salon που επιθυμείς επιλέγοντας από τα παραπάνω id:");
         int salonId = scanner.nextInt();
 
-        // Εύρεση stylists του συγκεκριμένου salon
+      
         List<String> stylists = getStylistsBySalonId(salonId);
 
         System.out.println("Stylists για το Salon ID " + salonId + ":");
@@ -94,7 +91,7 @@ public class AppointmentScheduler {
             System.out.println((i + 1) + ". " + stylists.get(i));
         }
 
-        //Επιλογή stylist
+      
         System.out.println("Διάλεξε έναν αριθμό από τη λίστα:");
         int choice = scanner.nextInt();
 
@@ -106,7 +103,7 @@ public class AppointmentScheduler {
         
         scanner.close();
         
-        //Κλείσιμο Ραντεβού
+       
         boolean success = scheduler.bookAppointment( userId, salonId, stylistId, serviceId, date, timeStart, timeEnd);
 
         if (success) {
