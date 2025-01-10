@@ -68,9 +68,21 @@ public class AppointmentScheduler {
     public static void main(String[] args) {
         AppointmentScheduler scheduler = new AppointmentScheduler();
 
-        //Επιλογή Salon
+        // Εισαγωγή περιοχής για εύρεση των διαθέσιμων salons
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Δάλεξε το salon που επιθυμείς:");
+        System.out.println("Ψάχνεις για salon σε ποια περιοχή:");
+        String location = scanner.next();
+        SalonDao salonDao = new SalonDao();
+        List<Salon> salonsList = salonDao.findSalonsByLocation(location);
+        
+        System.out.println("Salons στην περιοχή " + location + ":");
+        for (int i = 0; i < salonsList.size(); i++) {
+        	System.out.println(salonsList.get(i).getSalonId() + " - " + salonsList.get(i).getName() + " - " + salonsList.get(i).getPhoneNumber());
+        }
+        
+        //Επιλογή Salon
+        scanner = new Scanner(System.in);
+        System.out.println("Δάλεξε το salon που επιθυμείς επιλέγοντας από τα παραπάνω id:");
         int salonId = scanner.nextInt();
 
         // Εύρεση stylists του συγκεκριμένου salon
