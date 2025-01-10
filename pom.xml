@@ -5,12 +5,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.hairhub</groupId>
-  <artifactId>com.hairhub</artifactId>
+  <artifactId>appointment-scheduler</artifactId>
   <version>0.0.1</version>
 
-  <name>hairhub</name>
-  <!-- FIXME change it to the project's website -->
-  <url>http://www.example.com</url>
+  <name>Appointment Scheduler</name>
+  
+  <url>hexample.com</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
