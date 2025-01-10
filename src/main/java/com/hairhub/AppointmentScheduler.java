@@ -1,115 +1,154 @@
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.List;
+import java.util.Scanner;
 
-public class AppointmentScheduler {
+public class AppointmentSchedulerApp {
 
-    private Connection connection;
+    private AppointmentScheduler scheduler;
+    private SalonDao salonDao;
+    private CheckAvailability checkAvailability;
+    private Scanner scanner;
 
-    
-    public AppointmentScheduler(String db) throws SQLException {
-        connection =  DriverManager.getConnection(db);
+    public AppointmentSchedulerApp(String dbPath) throws SQLException {
+        this.scheduler = new AppointmentScheduler(dbPath);
+        this.salonDao = new SalonDao();
+        this.checkAvailability = new CheckAvailability(dbPath);
+        this.scanner = new Scanner(System.in);
     }
 
-  
-    public boolean bookAppointment(int userId, int salonId, int stylistId, int serviceId, date date, time timeStart, time timeEnd) {
-        
-        
-        String query = "INSERT INTO Appointments (user_id, salon_id, stylist_id, service_id, date, time_start, time_end) " +
-                       "VALUES (" + userId + ", " + salonId + ", " + stylistId + ", " + serviceId + ", " + date + ", " + timeStart + ", " + timeEnd )";
-        try (Connection conn = getConnection();
-            Statement stmt = conn.createStatement()) {
-          
-            int rowsInserted = stmt.executeUpdate(query);
-            return rowsInserted > 0;
-         } catch (SQLException e) {
-                e.printStackTrace();
-                return false;
-         }
-    
-    }
-   
-    private List<String> getStylistsBySalonId(int salon_Id) {
-        List<String> stylistNames = new ArrayList<>();
-        String query = "SELECT stylist_name FROM stylists WHERE salon_id = ?";
-        PreparedStatement preparedStatement = connection.prepareStatement(query)
-            
-        preparedStatement.setInt(1, salon_Id);
-
-        ResultSet resultSet = preparedStatement.executeQuery();
-
-        while (resultSet.next()) {
-            stylistNames.add(resultSet.getString("stylist_name"));
-        }
-        
-        return stylistNames;
-    }
-
-    private List<String> getServices() {
-        List<String> serviceTypes = new ArrayList<>();
-        String query = "SELECT service_type FROM services";
-        PreparedStatement preparedStatement = connection.prepareStatement(query)) 
-    
-
-        ResultSet resultSet = preparedStatement.executeQuery();
-
-        while (resultSet.next()) {
-            serviceTypes.add(resultSet.getString("service_type"));
-        }
-        
-        return serviceTypes;
-    }
-
-
-       public static void main(String[] args) {
-        AppointmentScheduler scheduler = new AppointmentScheduler();
-
+    public void run() throws SQLException {
+        public void run() throws SQLException {
+    try {
       
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Ψάχνεις για salon σε ποια περιοχή:");
-        String location = scanner.next();
-        SalonDao salonDao = new SalonDao();
-        List<Salon> salonsList = salonDao.findSalonsByLocation(location);
-        
-        System.out.println("Salons στην περιοχή " + location + ":");
-        for (int i = 0; i < salonsList.size(); i++) {
-        	System.out.println(salonsList.get(i).getSalonId() + " - " + salonsList.get(i).getName() + " - " + salonsList.get(i).getPhoneNumber());
+        int userId = getSignedInUserId(); 
+
+        String location = askForLocation();
+        List<Salon> salons = salonDao.findSalonsByLocation(location);
+
+        if (salons.isEmpty()) {
+            System.out.println("Δε βρέθηκαν salons στην περιοχή " + location + ".");
+            return;
         }
-       
-        scanner = new Scanner(System.in);
-        System.out.println("Δάλεξε το salon που επιθυμείς επιλέγοντας από τα παραπάνω id:");
+
+        displaySalons(salons);
+        int salonId = chooseSalon(salons);
+
+        List<String> stylists = scheduler.getStylistsBySalonId(salonId);
+
+        if (stylists.isEmpty()) {
+            System.out.println("Δεν υπάρχουν διαθέσιμοι stylists για το επιλεγμένο salon.");
+            return;
+        }
+
+
+            displayStylists(stylists);
+            int stylistIndex = chooseStylist(stylists);
+            String stylistName = stylists.get(stylistIndex - 1);
+
+            int userId = 1; 
+            int serviceId = askForService(); 
+            String serviceType = "Haircut"; /
+            String appointmentDate = askForDate();
+
+            
+            List<String> availableSlots = checkAvailability.FindTime(stylistName, appointmentDate, serviceType);
+
+            if (availableSlots.isEmpty()) {
+                System.out.println("Δεν υπάρχουν διαθέσιμα ραντεβού για τον επιλεγμένο stylist την ημερομηνία " + appointmentDate + ".");
+                return;
+            }
+
+            System.out.println("Διαθέσιμα ραντεβού:");
+            for (int i = 0; i < availableSlots.size(); i++) {
+                System.out.println((i + 1) + ". " + availableSlots.get(i));
+            }
+
+            System.out.println("Διάλεξε έναν αριθμό από τη λίστα:");
+            int slotChoice = scanner.nextInt();
+
+            if (slotChoice <= 0 || slotChoice > availableSlots.size()) {
+                throw new IllegalArgumentException("Μη έγκυρη επιλογή.");
+            }
+
+            String chosenTimeSlot = availableSlots.get(slotChoice - 1);
+            String[] timeParts = chosenTimeSlot.split("-");
+            String timeStart = timeParts[0].trim();
+            String timeEnd = timeParts[1].trim();
+
+            boolean success = scheduler.bookAppointment(userId, salonId, stylistIndex, serviceId, appointmentDate, timeStart, timeEnd);
+
+            if (success) {
+                System.out.println("Το ραντεβού κλείστηκε επιτυχώς!");
+            } else {
+                System.out.println("Η κράτηση απέτυχε.");
+            }
+        } catch (Exception e) {
+            System.err.println("Προέκυψε σφάλμα: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                checkAvailability.close();
+            } catch (SQLException e) {
+                System.err.println("Σφάλμα κατά το κλείσιμο της σύνδεσης: " + e.getMessage());
+            }
+            scanner.close();
+        }
+    }
+
+    private String askForLocation() {
+        System.out.println("Ψάχνεις για salon σε ποια περιοχή:");
+        return scanner.next();
+    }
+
+    private void displaySalons(List<Salon> salons) {
+        System.out.println("Salons στην περιοχή:");
+        for (Salon salon : salons) {
+            System.out.println(salon.getSalonId() + " - " + salon.getName() + " - " + salon.getPhoneNumber());
+        }
+    }
+
+    private int chooseSalon(List<Salon> salons) {
+        System.out.println("Δάλεξε το salon που επιθυμείς επιλέγοντας από τα παραπάνω ID:");
         int salonId = scanner.nextInt();
 
-      
-        List<String> stylists = getStylistsBySalonId(salonId);
+        boolean valid = salons.stream().anyMatch(salon -> salon.getSalonId() == salonId);
 
-        System.out.println("Stylists για το Salon ID " + salonId + ":");
-        
+        if (!valid) {
+            throw new IllegalArgumentException("Μη έγκυρο salon ID.");
+        }
+
+        return salonId;
+    }
+
+    private void displayStylists(List<String> stylists) {
+        System.out.println("Stylists:");
         for (int i = 0; i < stylists.size(); i++) {
             System.out.println((i + 1) + ". " + stylists.get(i));
         }
+    }
 
-      
+    private int chooseStylist(List<String> stylists) {
         System.out.println("Διάλεξε έναν αριθμό από τη λίστα:");
         int choice = scanner.nextInt();
 
-         if (choice > 0 && choice <= stylists.size()) {
-                
-            } else {
-                System.out.println("Μη έγκυρη επιλογή.");
-            }
-        
-        scanner.close();
-        
-       
-        boolean success = scheduler.bookAppointment( userId, salonId, stylistId, serviceId, date, timeStart, timeEnd);
-
-        if (success) {
-            System.out.println("Το ραντεβού κλείστηκε επιτυχώς!");
-        } else {
-            System.out.println("Η κράτηση απέτυχε.");
+        if (choice <= 0 || choice > stylists.size()) {
+            throw new IllegalArgumentException("Μη έγκυρη επιλογή.");
         }
+
+        return choice;
+    }
+
+    private int askForService() {
+        System.out.println("Επίλεξε το ID της υπηρεσίας που επιθυμείς:");
+        return scanner.nextInt();
+    }
+
+    private String askForDate() {
+        System.out.println("Εισήγαγε την ημερομηνία του ραντεβού (yyyy-MM-dd):");
+        return scanner.next();
     }
 }
+
+       
+   
+    
