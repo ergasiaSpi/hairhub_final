@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 public class SalonDao {
   public void addSalon(Salon salon) {
-    String query = "INSERT INTO Salons (name, address, location, phone_number, email, rating)VALUES( ?, ?, ?, ?, ?, ?)";
+    String query = "INSERT INTO Salons (name, address, phone_number, email, rating)VALUES( ?, ?, ?, ?, ?)";
     try (Connection conn = DatabaseConnection.getConnection();
          PreparedStatement stmt = conn.prepareStatement(query)){
         stmt.setString(1, salon.getName());
