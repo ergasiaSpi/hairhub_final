@@ -73,20 +73,17 @@ public class AppointmentScheduler {
     }
 
     // Main method for running the scheduler
-    public static void main(String[] args) {
-        try {
-            AppointmentScheduler scheduler = new AppointmentScheduler("jdbc:sqlite:your-database-path.db");
-            Scanner scanner = new Scanner(System.in);
-
+    public void runScheduler() {
+        try (Scanner scanner = new Scanner(System.in)) {
             // Get user ID from sign-in
-            int userId = scheduler.getSignedInUserId();
+            int userId = getSignedInUserId();
 
             // Prompt for salon selection
             System.out.println("Enter the salon ID you wish to choose:");
             int salonId = scanner.nextInt();
 
             // Fetch and display stylists
-            List<String> stylists = scheduler.getStylistsBySalonId(salonId);
+            List<String> stylists = getStylistsBySalonId(salonId);
             System.out.println("Stylists for salon ID " + salonId + ":");
             for (int i = 0; i < stylists.size(); i++) {
                 System.out.println((i + 1) + ". " + stylists.get(i));
@@ -99,11 +96,13 @@ public class AppointmentScheduler {
                 System.out.println("Invalid choice.");
                 return;
             }
-            String stylistName = stylists.get(stylistChoice - 1);
+            int stylistId = stylistChoice; // Example logic, adjust if stylist IDs differ.
 
-            // Booking details
+            // Prompt for service selection
             System.out.println("Enter service ID:");
             int serviceId = scanner.nextInt();
+
+            // Prompt for appointment date and time
             System.out.println("Enter appointment date (YYYY-MM-DD):");
             LocalDate date = LocalDate.parse(scanner.next());
             System.out.println("Enter appointment start time (HH:MM):");
@@ -112,7 +111,7 @@ public class AppointmentScheduler {
             LocalTime timeEnd = LocalTime.parse(scanner.next());
 
             // Book appointment
-            boolean success = scheduler.bookAppointment(userId, salonId, stylistChoice, serviceId, date, timeStart, timeEnd);
+            boolean success = bookAppointment(userId, salonId, stylistId, serviceId, date, timeStart, timeEnd);
             if (success) {
                 System.out.println("Appointment successfully booked!");
             } else {
