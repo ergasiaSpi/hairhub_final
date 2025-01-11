@@ -1,8 +1,9 @@
+package com.hairhub.Admin;
+
 public class Salon {
   private int salonId;
   private String name;
   private String address;
-  private String location;
   private String phoneNumber;
   private String email;
   private double rating;
@@ -24,12 +25,6 @@ public class Salon {
   }
   public void setAddress(String address) {
     this.address = address;
-  }
-  public String getLocation() {
-    return location;
-  }
-  public void setLocation(String location) {
-    this.location = location;
   }
   public String getPhoneNumber() {
     return phoneNumber;

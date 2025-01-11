@@ -1,13 +1,12 @@
+package com.hairhub.Admin;
 import java.util.List;
+
 public class SalonService {
-  private SalonDAO salonDAO = new SalonDAO();
+  private SalonDao salonDAO = new SalonDao();
   public void addSalon(Salon salon) {
     salonDAO.addSalon(salon);
   }
   public List<Salon> getAllSalons() {
     return salonDAO.getAllSalons();
-  }
-  public List<Salon> findSalonsByLocation(String location) {
-    return salonDAO.findSalonsByLoction(location);
   }
 }

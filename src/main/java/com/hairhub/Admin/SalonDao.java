@@ -1,3 +1,5 @@
+package com.hairhub.Admin;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +10,6 @@ public class SalonDao {
          PreparedStatement stmt = conn.prepareStatement(query)){
         stmt.setString(1, salon.getName());
         stmt.setString(2, salon.getAddress());
-        stmt.setString(3, salon.getLocation());
         stmt.setString(4, salon.getPhoneNumber());
         stmt.setString(5, salon.getEmail());
         stmt.setDouble(6, salon.getRating());
@@ -21,14 +22,13 @@ public class SalonDao {
       List<Salon> salons = new ArrayList<>();
       String query = "SELECT * FROM Salons";
       try (Connection conn = DatabaseConnection.getConnection();
-           PreparedStatement stmt = conn.prepareStatement(query));
+           PreparedStatement stmt = conn.prepareStatement(query);
            ResultSet rs = stmt.executeQuery()) {
         while (rs.next()) {
             Salon salon = new Salon();
             salon.setSalonId(rs.getInt("salon_id"));
             salon.setName(rs.getString("name"));
             salon.setAddress(rs.getString("address"));
-            salon.setLocation(rs.getString("location"));
             salon.setPhoneNumber(rs.getString("phone_number"));
             salon.setEmail(rs.getString("email"));
             salon.setRating(rs.getDouble("rating"));
@@ -51,7 +51,6 @@ public class SalonDao {
            salon.setSalonId(rs.getInt("salon_id"));
            salon.setName(rs.getString("name"));
            salon.setAddress(rs.getString("address"));
-           salon.setLocation(rs.getString("location"));
            salon.setPhoneNumber(rs.getString("phone_number"));
            salon.setEmail(rs.getString("email"));
            salon.setRating(rs.getDouble("rating"));
