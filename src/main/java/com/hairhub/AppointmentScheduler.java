@@ -77,18 +77,18 @@ public class AppointmentScheduler {
         try (Scanner scanner = new Scanner(System.in)) {
             // Get user ID from sign-in
             int userId = getSignedInUserId();
-
+    
             // Prompt for salon selection
             System.out.println("Enter the salon ID you wish to choose:");
             int salonId = scanner.nextInt();
-
+    
             // Fetch and display stylists
             List<String> stylists = getStylistsBySalonId(salonId);
             System.out.println("Stylists for salon ID " + salonId + ":");
             for (int i = 0; i < stylists.size(); i++) {
                 System.out.println((i + 1) + ". " + stylists.get(i));
             }
-
+    
             // Prompt for stylist selection
             System.out.println("Choose a stylist by number:");
             int stylistChoice = scanner.nextInt();
@@ -96,29 +96,75 @@ public class AppointmentScheduler {
                 System.out.println("Invalid choice.");
                 return;
             }
-            int stylistId = stylistChoice; // Example logic, adjust if stylist IDs differ.
-
+            String stylistName = stylists.get(stylistChoice - 1);
+    
             // Prompt for service selection
-            System.out.println("Enter service ID:");
-            int serviceId = scanner.nextInt();
-
-            // Prompt for appointment date and time
+            List<String> services = getServices();
+            System.out.println("Available services:");
+            for (int i = 0; i < services.size(); i++) {
+                System.out.println((i + 1) + ". " + services.get(i));
+            }
+    
+            System.out.println("Choose a service by number:");
+            int serviceChoice = scanner.nextInt();
+            if (serviceChoice <= 0 || serviceChoice > services.size()) {
+                System.out.println("Invalid service choice.");
+                return;
+            }
+            String serviceType = services.get(serviceChoice - 1);
+    
+            // Prompt for appointment date
             System.out.println("Enter appointment date (YYYY-MM-DD):");
-            LocalDate date = LocalDate.parse(scanner.next());
-            System.out.println("Enter appointment start time (HH:MM):");
-            LocalTime timeStart = LocalTime.parse(scanner.next());
-            System.out.println("Enter appointment end time (HH:MM):");
-            LocalTime timeEnd = LocalTime.parse(scanner.next());
-
-            // Book appointment
-            boolean success = bookAppointment(userId, salonId, stylistId, serviceId, date, timeStart, timeEnd);
+            String appointmentDate = scanner.next();
+    
+            // Check available time slots using CheckAvailability
+            CheckAvailability checkAvailability = new CheckAvailability("jdbc:sqlite:your-database-path.db");
+            List<String> availableTimeSlots = checkAvailability.FindTime(stylistName, appointmentDate, serviceType);
+    
+            if (availableTimeSlots.isEmpty()) {
+                System.out.println("No available time slots for the selected stylist, date, and service.");
+                return;
+            }
+    
+            // Display available time slots
+            System.out.println("Available time slots:");
+            for (int i = 0; i < availableTimeSlots.size(); i++) {
+                System.out.println((i + 1) + ". " + availableTimeSlots.get(i));
+            }
+    
+            // Prompt for time slot selection
+            System.out.println("Choose a time slot by number:");
+            int timeSlotChoice = scanner.nextInt();
+            if (timeSlotChoice <= 0 || timeSlotChoice > availableTimeSlots.size()) {
+                System.out.println("Invalid time slot choice.");
+                return;
+            }
+    
+            String chosenTimeSlot = availableTimeSlots.get(timeSlotChoice - 1);
+            String[] timeParts = chosenTimeSlot.split("-");
+            LocalTime timeStart = LocalTime.parse(timeParts[0]);
+            LocalTime timeEnd = LocalTime.parse(timeParts[1]);
+    
+            // Get stylist ID (assuming stylist IDs are aligned with list order)
+            int stylistId = stylistChoice;
+    
+            // Get service ID (assuming service IDs are aligned with list order)
+            int serviceId = serviceChoice;
+    
+            // Book the appointment
+            boolean success = bookAppointment(userId, salonId, stylistId, serviceId, LocalDate.parse(appointmentDate), timeStart, timeEnd);
             if (success) {
                 System.out.println("Appointment successfully booked!");
             } else {
                 System.out.println("Failed to book the appointment.");
             }
+    
+            // Close CheckAvailability connection
+            checkAvailability.close();
+    
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+    
 }
