@@ -116,7 +116,7 @@ public class Appointment {
     public Appointment insertNewAppointment(Appointment appointment) throws SQLException {
         
         try {
-        	/
+        	
         	Connection conn = DriverManager.getConnection(DB_SERVER, DB_USER, DB_PASSWORD);
 
         	
@@ -176,7 +176,8 @@ public class Appointment {
         } catch(Exception e) {
         	System.out.println(e.getMessage());
         }
-        return null; 
+        return null;
+    } 
 
     public boolean updateAppointment(Appointment appointment) throws SQLException {
         
