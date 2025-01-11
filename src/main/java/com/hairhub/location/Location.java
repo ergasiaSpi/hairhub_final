@@ -1,3 +1,4 @@
+package com.hairhub.location;
 public class Location {
     private String zipcode;
     private double latitude;

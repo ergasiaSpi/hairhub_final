@@ -1,3 +1,4 @@
+package com.hairhub.appointment;
 import java.sql.*;
 import java.time.LocalTime;
 import java.util.ArrayList;
