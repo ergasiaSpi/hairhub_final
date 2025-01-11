@@ -39,26 +39,4 @@ public class SalonDao {
       }
       return salons;
    }
-  public List<Salon> findSalonsByLocation(String location) {
-     List<Salon> salons = new ArrayList<>();
-     String query = "SELECT * FROM Salons WHERE location = ?";
-    try (Connection conn = DatabaseConnection.getConnection();
-         PreparedStatement stmt = conn.prepareStatement(query)) {
-        stmt.setString(1, location);
-        ResultSet rs = stmt.executeQuery();
-       while (rs.next()) {
-           Salon salon = new Salon();
-           salon.setSalonId(rs.getInt("salon_id"));
-           salon.setName(rs.getString("name"));
-           salon.setAddress(rs.getString("address"));
-           salon.setPhoneNumber(rs.getString("phone_number"));
-           salon.setEmail(rs.getString("email"));
-           salon.setRating(rs.getDouble("rating"));
-           salons.add(salon);
-           }
-         } catch (SQLException e) {
-             e.printStackTrace();
-         }
-         return salons;
-         }
-       }
+  }
