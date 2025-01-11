@@ -13,6 +13,9 @@ public class UserInput {
             System.out.println("Username: ");
             Username = input.nextLine();
             valid = Constrictions.Username_Constrictions(Username);
+            if (!valid) {
+                System.out.println("Invalid username. Please try again.");
+            }
         } while (!valid);
         return Username;
     }  
@@ -24,6 +27,9 @@ public class UserInput {
             System.out.println("Password: ");
             Password = input.nextLine();
             valid = Constrictions.Password_Constrictions(Password);
+            if (!valid) {
+                System.out.println("Invalid password. Please try again.");
+            }
         } while (!valid);
         return Password;    
     }
@@ -35,6 +41,9 @@ public class UserInput {
             System.out.println("Phone Number (format: +XXX-XXX-XXXX): ");
             phone = input.nextLine();
             valid = Constrictions.Phone_Constrictions(phone);
+            if (!valid) {
+                System.out.println("Invalid phone number. Please try again.");
+            }
         } while (!valid);
         return phone;
     }
@@ -46,6 +55,9 @@ public class UserInput {
             System.out.println("Email: ");
             email = input.nextLine();
             valid = Constrictions.Email_Constrictions(email);
+            if (!valid) {
+                System.out.println("Invalid phone number. Please try again.");
+            }
         } while (!valid);
         return email;
     }
@@ -57,6 +69,9 @@ public class UserInput {
             System.out.println("Postal Code (5 digits): ");
             postcode = input.nextLine();
             valid = Constrictions.Postcode_Constrictions(postcode);
+            if (!valid) {
+                System.out.println("Invalid postal code. Please try again.");
+            }
         } while (!valid);
         return postcode;
     }
@@ -69,6 +84,9 @@ public class UserInput {
             role = input.nextLine();
             role.toLowerCase();
             valid = Constrictions.Role_Constrictions(role);
+            if (!valid) {
+                System.out.println("Invalid role. Please try again.");
+            }
         } while (!valid);
         return role;
     }
