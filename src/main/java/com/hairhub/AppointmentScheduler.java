@@ -1,39 +1,25 @@
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 public class AppointmentScheduler {
 
     private Connection connection;
-    private DistanceCalculator distanceCalculator;
-    private CheckAvailability checkAvailability;
+    private static final String DATABASE_URL = "jdbc:sqlite:your-database-path.db"; // Update your database path
 
-    // Constructor to initialize the database connection and dependencies
-    public AppointmentScheduler(String db) throws SQLException {
-        connection = DriverManager.getConnection(db);
-        this.distanceCalculator = new DistanceCalculator(connection); // Initialize DistanceCalculator
-        this.checkAvailability = new CheckAvailability(connection); // Initialize CheckAvailability
+    // Constructor to initialize the database connection
+    public AppointmentScheduler() throws SQLException {
+        connection = DriverManager.getConnection(DATABASE_URL);
     }
 
     // Method to book an appointment
-    public boolean bookAppointment(int userId, int salonId, int stylistId, int serviceId,
-                                   LocalDate date, LocalTime timeStart, LocalTime timeEnd) throws SQLException {
-        // Check if the service is available at the salon
-        if (!checkAvailability.isServiceAvailable(salonId, getServiceType(serviceId))) {
-            System.out.println("Service is not available at this salon.");
-            return false;
-        }
-
-        // Check if the stylist is available at the selected time
-        if (!checkAvailability.isStylistAvailable(stylistId, date, timeStart, timeEnd)) {
-            System.out.println("Stylist is not available at this time.");
-            return false;
-        }
-
-        // Proceed with booking if available
-        String query = "INSERT INTO Appointments (user_id, salon_id, stylist_id, service_id, date, time_start, time_end, status) " +
-                       "VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')";
+    public boolean bookAppointment(int userId, int salonId, int stylistId, int serviceId, 
+                                   LocalDate date, LocalTime timeStart, LocalTime timeEnd) {
+        String query = "INSERT INTO Appointments (user_id, salon_id, stylist_id, service_id, date, time_start, time_end) " +
+                       "VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, userId);
             stmt.setInt(2, salonId);
@@ -44,23 +30,13 @@ public class AppointmentScheduler {
             stmt.setTime(7, java.sql.Time.valueOf(timeEnd));
             int rowsInserted = stmt.executeUpdate();
             return rowsInserted > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 
-    // Method to get the service type by service ID
-    private String getServiceType(int serviceId) throws SQLException {
-        String query = "SELECT service_type FROM Services WHERE service_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, serviceId);
-            ResultSet resultSet = stmt.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getString("service_type");
-            }
-        }
-        return null;
-    }
-
-    // Method to get stylist names for a salon ID
+    // Method to get stylists by salon ID
     private List<String> getStylistsBySalonId(int salonId) throws SQLException {
         List<String> stylistNames = new ArrayList<>();
         String query = "SELECT stylist_name FROM Stylists WHERE salon_id = ?";
@@ -74,7 +50,7 @@ public class AppointmentScheduler {
         return stylistNames;
     }
 
-    // Method to get available services from the salon
+    // Method to get available services
     private List<String> getServices() throws SQLException {
         List<String> serviceTypes = new ArrayList<>();
         String query = "SELECT service_type FROM Services";
@@ -87,10 +63,9 @@ public class AppointmentScheduler {
         return serviceTypes;
     }
 
-    // Method to get user ID (assuming a method to check the current signed-in user)
+    // Method to get the user's ID (assuming the user is already signed in)
     private int getSignedInUserId() {
-        // Assuming the SignIn class manages authentication
-        SignIn signIn = new SignIn();
+        SignIn signIn = new SignIn(); // Assuming SignIn handles the authentication session
         if (signIn.isUserSignedIn()) {
             return signIn.getUserId();
         } else {
@@ -98,15 +73,74 @@ public class AppointmentScheduler {
         }
     }
 
-    // Method to run the appointment scheduler interface
+    // Method to calculate the distance between the user's location and the salon location
+    private double calculateDistance(int userZipcode, String salonZipcode) throws SQLException {
+        String query = "SELECT latitude, longitude FROM Location WHERE zipcode = ?";
+        double userLat = 0.0, userLon = 0.0, salonLat = 0.0, salonLon = 0.0;
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            // Get the user's latitude and longitude
+            stmt.setInt(1, userZipcode);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                userLat = rs.getDouble("latitude");
+                userLon = rs.getDouble("longitude");
+            }
+
+            // Get the salon's latitude and longitude
+            stmt.setString(1, salonZipcode);
+            rs = stmt.executeQuery();
+            if (rs.next()) {
+                salonLat = rs.getDouble("latitude");
+                salonLon = rs.getDouble("longitude");
+            }
+        }
+
+        // Haversine formula to calculate the distance
+        final double R = 6371; // Radius of the Earth in km
+        double dLat = Math.toRadians(salonLat - userLat);
+        double dLon = Math.toRadians(salonLon - userLon);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                   Math.cos(Math.toRadians(userLat)) * Math.cos(Math.toRadians(salonLat)) *
+                   Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c; // returns distance in km
+    }
+
+    // Method to run the appointment scheduler
     public void runScheduler() {
         try (Scanner scanner = new Scanner(System.in)) {
             int userId = getSignedInUserId();
 
-            // Prompt for salon and stylist selection
+            // Get salon selection
             System.out.println("Enter the salon ID you wish to choose:");
             int salonId = scanner.nextInt();
 
+            // Get salon zipcode from database
+            String salonZipcode = "";
+            String query = "SELECT zipcode FROM Salons WHERE salon_id = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                stmt.setInt(1, salonId);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    salonZipcode = rs.getString("zipcode");
+                }
+            }
+
+            // Get user's zipcode from session (assuming it's stored)
+            int userZipcode = 12345; // Replace with real user zipcode from session
+
+            // Calculate distance from user to salon
+            double distance = calculateDistance(userZipcode, salonZipcode);
+            System.out.println("Distance from your location to the salon: " + distance + " km");
+
+            // Check if salon is within a desired range (e.g., 10 km)
+            if (distance > 10) {
+                System.out.println("The salon is too far away from your location. Please choose a closer salon.");
+                return;
+            }
+
+            // Fetch stylists by salon ID
             List<String> stylists = getStylistsBySalonId(salonId);
             System.out.println("Stylists for salon ID " + salonId + ":");
             for (int i = 0; i < stylists.size(); i++) {
@@ -115,13 +149,9 @@ public class AppointmentScheduler {
 
             System.out.println("Choose a stylist by number:");
             int stylistChoice = scanner.nextInt();
-            if (stylistChoice <= 0 || stylistChoice > stylists.size()) {
-                System.out.println("Invalid choice.");
-                return;
-            }
             String stylistName = stylists.get(stylistChoice - 1);
 
-            // Prompt for service selection
+            // Fetch available services
             List<String> services = getServices();
             System.out.println("Available services:");
             for (int i = 0; i < services.size(); i++) {
@@ -130,19 +160,15 @@ public class AppointmentScheduler {
 
             System.out.println("Choose a service by number:");
             int serviceChoice = scanner.nextInt();
-            if (serviceChoice <= 0 || serviceChoice > services.size()) {
-                System.out.println("Invalid service choice.");
-                return;
-            }
             String serviceType = services.get(serviceChoice - 1);
 
-            // Prompt for appointment date
+            // Get appointment date
             System.out.println("Enter appointment date (YYYY-MM-DD):");
             String appointmentDate = scanner.next();
 
-            // Check available time slots using CheckAvailability
-            List<String> availableTimeSlots = checkAvailability.findAvailableTimeSlots(stylistChoice, LocalDate.parse(appointmentDate), serviceType);
-
+            // Use CheckAvailability to find available time slots
+            CheckAvailability checkAvailability = new CheckAvailability(DATABASE_URL);
+            List<String> availableTimeSlots = checkAvailability.FindTime(stylistName, appointmentDate, serviceType);
             if (availableTimeSlots.isEmpty()) {
                 System.out.println("No available time slots for the selected stylist, date, and service.");
                 return;
@@ -154,26 +180,26 @@ public class AppointmentScheduler {
                 System.out.println((i + 1) + ". " + availableTimeSlots.get(i));
             }
 
-            // Prompt for time slot selection
+            // Select time slot
             System.out.println("Choose a time slot by number:");
             int timeSlotChoice = scanner.nextInt();
-            if (timeSlotChoice <= 0 || timeSlotChoice > availableTimeSlots.size()) {
-                System.out.println("Invalid time slot choice.");
-                return;
-            }
-
             String chosenTimeSlot = availableTimeSlots.get(timeSlotChoice - 1);
             String[] timeParts = chosenTimeSlot.split("-");
             LocalTime timeStart = LocalTime.parse(timeParts[0]);
             LocalTime timeEnd = LocalTime.parse(timeParts[1]);
 
             // Book the appointment
-            boolean success = bookAppointment(userId, salonId, stylistChoice, serviceChoice, LocalDate.parse(appointmentDate), timeStart, timeEnd);
+            boolean success = bookAppointment(userId, salonId, stylistChoice, serviceChoice, 
+                                              LocalDate.parse(appointmentDate), timeStart, timeEnd);
             if (success) {
                 System.out.println("Appointment successfully booked!");
             } else {
                 System.out.println("Failed to book the appointment.");
             }
+
+            // Close CheckAvailability connection
+            checkAvailability.close();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
