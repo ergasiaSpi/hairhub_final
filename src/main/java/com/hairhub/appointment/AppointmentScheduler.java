@@ -20,18 +20,19 @@ public class AppointmentScheduler {
     }
 
     // Method to book an appointment
-    public boolean bookAppointment(int userId, int salonId, int stylistId, int serviceId, 
+    public boolean bookAppointment(int appointmentId,int userId, int salonId, int stylistId, int serviceId, 
                                    LocalDate date, LocalTime timeStart, LocalTime timeEnd) {
-        String query = "INSERT INTO Appointments (user_id, salon_id, stylist_id, service_id, date, time_start, time_end) " +
+        String query = "INSERT INTO Appointments (appointment_id, user_id, salon_id, stylist_id, service_id, date, time_start, time_end) " +
                        "VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, userId);
-            stmt.setInt(2, salonId);
-            stmt.setInt(3, stylistId);
-            stmt.setInt(4, serviceId);
-            stmt.setDate(5, java.sql.Date.valueOf(date));
-            stmt.setTime(6, java.sql.Time.valueOf(timeStart));
-            stmt.setTime(7, java.sql.Time.valueOf(timeEnd));
+            stmt.setInt(1, appointmentId);
+            stmt.setInt(2, userId);
+            stmt.setInt(3, salonId);
+            stmt.setInt(4, stylistId);
+            stmt.setInt(5, serviceId);
+            stmt.setDate(6, java.sql.Date.valueOf(date));
+            stmt.setTime(7, java.sql.Time.valueOf(timeStart));
+            stmt.setTime(8, java.sql.Time.valueOf(timeEnd));
             int rowsInserted = stmt.executeUpdate();
             return rowsInserted > 0;
         } catch (SQLException e) {
