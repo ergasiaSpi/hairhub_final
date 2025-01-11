@@ -131,10 +131,10 @@ public class AppointmentScheduler {
                 }
             }
 
-            // Get user's zipcode from session (assuming it's stored)
+            // ΔΑΝΑΗ ΔΙΟΡΘΩΣΕ ΑΥΤΗΝ ΤΗΝ ΜΑΛΑΚΙΑ ΓΑΜΩ ΤΟ ΣΠΙΤΙ ΣΟΥ
             int userZipcode = 12345; // Replace with real user zipcode from session
 
-            // Calculate distance from user to salon
+           
             double distance = calculateDistance(userZipcode, salonZipcode);
             System.out.println("Distance from your location to the salon: " + distance + " km");
 
@@ -192,8 +192,8 @@ public class AppointmentScheduler {
             LocalTime timeStart = LocalTime.parse(timeParts[0]);
             LocalTime timeEnd = LocalTime.parse(timeParts[1]);
 
-            // Book the appointment
-            boolean success = bookAppointment(userId, salonId, stylistChoice, serviceChoice, 
+            // ΝΕΦΕΛΗ ΔΕΣ ΤΙ ΠΑΙΖΕΙ ΕΔΩ 
+            boolean success = bookAppointment(int appointmentId, userId, salonId, stylistChoice, serviceChoice, 
                                               LocalDate.parse(appointmentDate), timeStart, timeEnd);
             if (success) {
                 System.out.println("Appointment successfully booked!");
