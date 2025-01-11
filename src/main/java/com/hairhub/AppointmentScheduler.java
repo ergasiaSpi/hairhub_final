@@ -72,7 +72,7 @@ public class AppointmentScheduler {
         }
     }
 
-    // Main method for running the scheduler
+   
     public void runScheduler() {
         try (Scanner scanner = new Scanner(System.in)) {
             // Get user ID from sign-in
