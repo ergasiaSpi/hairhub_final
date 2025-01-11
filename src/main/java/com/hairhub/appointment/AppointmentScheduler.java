@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import com.hairhub.sign_in_up.UserInput;
+import com.hairhub.sign_in_up.UserSessionManager;
+
 public class AppointmentScheduler {
 
     private Connection connection;
@@ -66,13 +69,12 @@ public class AppointmentScheduler {
 
     // Method to get the user's ID (assuming the user is already signed in)
     private int getSignedInUserId() {
-        SignIn signIn = new SignIn(); // Assuming SignIn handles the authentication session
-        if (signIn.isUserSignedIn()) {
-            return signIn.getUserId();
-        } else {
-            throw new IllegalStateException("User is not signed in. Please log in to proceed.");
-        }
+    if (UserSessionManager.isUserSignedIn()) {
+        return UserSessionManager.getSignedInUserId();
+    } else {
+        throw new IllegalStateException("User is not signed in. Please log in to proceed.");
     }
+}
 
     // Method to calculate the distance between the user's location and the salon location
     private double calculateDistance(int userZipcode, String salonZipcode) throws SQLException {
