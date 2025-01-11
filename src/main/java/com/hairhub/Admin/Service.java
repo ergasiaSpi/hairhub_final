@@ -1,3 +1,5 @@
+package com.hairhub.Admin;
+
 public class Service {
 
     // Ιδιότητες της κλάσης
