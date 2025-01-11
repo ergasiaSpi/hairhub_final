@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import com.hairhub.sign_in_up.UserInput;
+
 import com.hairhub.sign_in_up.UserSessionManager;
 
 public class AppointmentScheduler {
