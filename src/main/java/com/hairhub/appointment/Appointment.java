@@ -4,10 +4,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class Appointment {
-	
-   
+
     private int appointmentId;
     private int userId;
     private int salonId;
@@ -16,19 +14,16 @@ public class Appointment {
     private Date date;
     private Time timeStart;
     private String status;
-    private static final String DB_SERVER = "jdbc:mysql://localhost:3306/hair_hub";
-    private static final String DB_USER = "username";
-    private static final String DB_PASSWORD = "******";
 
-    
+    // SQLite database path (use your actual path here)
+    private static final String DB_SERVER = "jdbc:sqlite:/path/to/your/database.db";
+
     public Appointment() {
-    	
-	}
-    
+    }
 
     public Appointment(int appointmentId, int userId, int salonId, int stylistId, int serviceId, Date date, Time timeStart, String status) {
-    	this.appointmentId = appointmentId;
-    	this.userId = userId;
+        this.appointmentId = appointmentId;
+        this.userId = userId;
         this.salonId = salonId;
         this.stylistId = stylistId;
         this.serviceId = serviceId;
@@ -37,9 +32,8 @@ public class Appointment {
         this.status = status;
     }
 
-    
     public Appointment(int userId, int salonId, int stylistId, int serviceId, Date date, Time timeStart, String status) {
-    	this.userId = userId;
+        this.userId = userId;
         this.salonId = salonId;
         this.stylistId = stylistId;
         this.serviceId = serviceId;
@@ -47,9 +41,8 @@ public class Appointment {
         this.timeStart = timeStart;
         this.status = status;
     }
-    
 
-	
+    // Getters and setters...
     public int getAppointmentId() {
         return appointmentId;
     }
@@ -114,15 +107,11 @@ public class Appointment {
         this.status = status;
     }
 
-   
+    // Insert a new appointment into the database
     public Appointment insertNewAppointment(Appointment appointment) throws SQLException {
-        
-        try {
-        	
-        	Connection conn = DriverManager.getConnection(DB_SERVER, DB_USER, DB_PASSWORD);
 
-        	
-        	String sql = "INSERT INTO appointments (user_id, salon_id, stylist_id, service_id, date, time_start, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DriverManager.getConnection(DB_SERVER)) {
+            String sql = "INSERT INTO appointments (user_id, salon_id, stylist_id, service_id, date, time_start, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             stmt.setInt(1, appointment.getUserId());
             stmt.setInt(2, appointment.getSalonId());
@@ -133,37 +122,28 @@ public class Appointment {
             stmt.setString(7, appointment.getStatus());
             stmt.executeUpdate();
 
-            
             ResultSet rs = stmt.getGeneratedKeys();
             if (rs.next()) {
                 appointment.setAppointmentId(rs.getInt(1));
-                
                 return appointment;
             }
-        } catch(Exception e) {
-        	System.out.println(e.getMessage());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
-        
         return null;
     }
 
-    
+    // Search for an appointment by its ID
     public static Appointment searchAppointmentById(int id) throws SQLException {
 
-        try {
-        	
-        	Connection conn = DriverManager.getConnection(DB_SERVER, DB_USER, DB_PASSWORD);
-        	
-        	
+        try (Connection conn = DriverManager.getConnection(DB_SERVER)) {
             String sql = "SELECT * FROM appointments WHERE appointment_id = ?";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
 
-            
             if (rs.next()) {
                 Appointment appointment = new Appointment();
-               
                 appointment.setAppointmentId(rs.getInt("appointment_id"));
                 appointment.setUserId(rs.getInt("user_id"));
                 appointment.setSalonId(rs.getInt("salon_id"));
@@ -172,25 +152,19 @@ public class Appointment {
                 appointment.setDate(rs.getDate("date"));
                 appointment.setTimeStart(rs.getTime("time_start"));
                 appointment.setStatus(rs.getString("status"));
-               
                 return appointment;
             }
-        } catch(Exception e) {
-        	System.out.println(e.getMessage());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
         return null;
-    } 
+    }
 
+    // Update an existing appointment
     public boolean updateAppointment(Appointment appointment) throws SQLException {
-        
-        try {
-        	
-        	Connection conn = DriverManager.getConnection(DB_SERVER, DB_USER, DB_PASSWORD);
-        	
-        	
-        	String sql = "UPDATE appointments SET "
-        			+ "user_id = ?, salon_id = ?, stylist_id = ?, service_id = ?, date = ?, time_start = ?, status = ? "
-        			+ "WHERE appointment_id = ?";
+
+        try (Connection conn = DriverManager.getConnection(DB_SERVER)) {
+            String sql = "UPDATE appointments SET user_id = ?, salon_id = ?, stylist_id = ?, service_id = ?, date = ?, time_start = ?, status = ? WHERE appointment_id = ?";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setInt(1, appointment.getUserId());
             stmt.setInt(2, appointment.getSalonId());
@@ -201,48 +175,38 @@ public class Appointment {
             stmt.setString(7, appointment.getStatus());
             stmt.setInt(8, appointment.getAppointmentId());
             stmt.executeUpdate();
-            
             return true;
-        } catch(Exception e) {
-        	System.out.println(e.getMessage());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
-       
         return false;
     }
 
-  
+    // Delete an appointment from the database
     public boolean deleteAppointment(Appointment appointment) throws SQLException {
-        
-        try {
-        	
-        	Connection conn = DriverManager.getConnection(DB_SERVER, DB_USER, DB_PASSWORD);
-        	
-        	
-        	String sql = "DELETE FROM appointments WHERE appointment_id = ?";
+
+        try (Connection conn = DriverManager.getConnection(DB_SERVER)) {
+            String sql = "DELETE FROM appointments WHERE appointment_id = ?";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setInt(1, appointment.getAppointmentId());
             stmt.executeUpdate();
             return true;
-        } catch(Exception e) {
-        	System.out.println(e.getMessage());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
         return false;
     }
 
+    // List all appointments
     public static List<Appointment> listAppointments() throws SQLException {
-    	
-        List<Appointment> appointments = new ArrayList<>();
-        
-        try {
-        	
-        	Connection conn = DriverManager.getConnection(DB_SERVER, DB_USER, DB_PASSWORD);
 
-        	
-        	String sql = "SELECT * FROM appointments";
+        List<Appointment> appointments = new ArrayList<>();
+
+        try (Connection conn = DriverManager.getConnection(DB_SERVER)) {
+            String sql = "SELECT * FROM appointments";
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
-            
-            
+
             while (rs.next()) {
                 Appointment appointment = new Appointment();
                 appointment.setAppointmentId(rs.getInt("appointment_id"));
@@ -255,11 +219,10 @@ public class Appointment {
                 appointment.setStatus(rs.getString("status"));
                 appointments.add(appointment);
             }
-        } catch(Exception e) {
-        	System.out.println(e.getMessage());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
-      
+
         return appointments;
     }
-    
 }
