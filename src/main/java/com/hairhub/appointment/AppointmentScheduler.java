@@ -20,7 +20,7 @@ public class AppointmentScheduler {
     }
 
     // Method to book an appointment
-    public boolean bookAppointment(int userId, int salonId, int stylistId, int serviceId, 
+      public boolean bookAppointment(int userId, int salonId, int stylistId, int serviceId, 
                                    LocalDate date, LocalTime timeStart, LocalTime timeEnd) {
         String query = "INSERT INTO Appointments (appointment_id, user_id, salon_id, stylist_id, service_id, date, time_start, time_end) " +
                        "VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -75,13 +75,6 @@ public class AppointmentScheduler {
         throw new IllegalStateException("User is not signed in. Please log in to proceed.");
     }
 
-    // ΔΑΝΑΗ ΔΙΟΡΘΩΣΕ ΑΥΤΗΝ ΤΗΝ ΜΑΛΑΚΙΑ ΓΑΜΩ ΤΟ ΣΠΙΤΙ ΣΟΥ
-    private String getUserZipcode();
-    if(ZipcodeSessionManager.isZipcodeSet()) {
-        return ZipcodeSessionManager.getUserZipcode();
-    } else {
-        throw new IllegalStateException("User ZipCode is not available.");
-    }
 }
 
     // Method to calculate the distance between the user's location and the salon location
@@ -138,7 +131,7 @@ public class AppointmentScheduler {
                 }
             }
 
-            String userZipcode = getUserZipcode();       
+            String userZipcode = ZipcodeSessionManager.getUserZipcode();       
 
             double distance = calculateDistance(userZipcode, salonZipcode);
             System.out.println("Distance from your location to the salon: " + distance + " km");
