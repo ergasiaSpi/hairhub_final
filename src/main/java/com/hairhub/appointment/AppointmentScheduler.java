@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-
+import com.hairhub.location.ZipcodeSessionManager;
 import com.hairhub.sign_in_up.UserSessionManager;
 
 public class AppointmentScheduler {
@@ -131,7 +131,12 @@ public class AppointmentScheduler {
             }
 
             // ΔΑΝΑΗ ΔΙΟΡΘΩΣΕ ΑΥΤΗΝ ΤΗΝ ΜΑΛΑΚΙΑ ΓΑΜΩ ΤΟ ΣΠΙΤΙ ΣΟΥ
-            int userZipcode = 12345; // Replace with real user zipcode from session
+            private String getUserZipcode();
+            if(ZipcodeSessionManager.isZipcodeSet()) {
+                return ZipcodeSessionManager.getUserZipcode();
+            } else {
+                throw new IllegalStateException("User ZipCode is not available.");
+            }
 
            
             double distance = calculateDistance(userZipcode, salonZipcode);
