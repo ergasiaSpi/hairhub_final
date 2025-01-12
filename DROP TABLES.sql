@@ -1,0 +1,11 @@
+DROP TABLE IF EXISTS "Users";
+DROP TABLE IF EXISTS "Salons";
+DROP TABLE IF EXISTS "Location";
+DROP TABLE IF EXISTS "Stylists";
+DROP TABLE IF EXISTS "Services";
+DROP TABLE IF EXISTS "AvailabilitybyStylist";
+DROP TABLE IF EXISTS "Appointments";
+DROP TABLE IF EXISTS "Reviews";
+
+
+
