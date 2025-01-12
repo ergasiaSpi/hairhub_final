@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS "Stylists";
 DROP TABLE IF EXISTS "Services";
 DROP TABLE IF EXISTS "AvailabilitybyStylist";
 DROP TABLE IF EXISTS "Appointments";
-DROP TABLE IF EXISTS "Reviews";
+
 
 
 
