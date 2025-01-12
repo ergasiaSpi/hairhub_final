@@ -3,15 +3,14 @@ import java.util.ArrayList;
 import java.util.List;
 public class SalonDao {
   public void addSalon(Salon salon) {
-    String query = "INSERT INTO Salons (name, address, location, phone_number, email, rating)VALUES( ?, ?, ?, ?, ?, ?)";
-    try (Connection conn = DatabaseConnection.getConnection();
-         PreparedStatement stmt = conn.prepareStatement(query)){
+    String query = "INSERT INTO Salons (name, address, location, phone_number, email,)VALUES( ?, ?, ?, ?, ?)";
+    try (Connection conn = DriverManager.getConnection(DB_URL);
+         PreparedStatement stmt = conn.prepareStatement(INSERT_SQL)) {
         stmt.setString(1, salon.getName());
         stmt.setString(2, salon.getAddress());
         stmt.setString(3, salon.getLocation());
         stmt.setString(4, salon.getPhoneNumber());
         stmt.setString(5, salon.getEmail());
-        stmt.setDouble(6, salon.getRating());
         stmt.executeUpdate();
      } catch (SQLException e) {
          e.printStackTrace();
@@ -21,7 +20,7 @@ public class SalonDao {
       List<Salon> salons = new ArrayList<>();
       String query = "SELECT * FROM Salons";
       try (Connection conn = DatabaseConnection.getConnection();
-           PreparedStatement stmt = conn.prepareStatement(query));
+           PreparedStatement stmt = conn.prepareStatement(query);
            ResultSet rs = stmt.executeQuery()) {
         while (rs.next()) {
             Salon salon = new Salon();
