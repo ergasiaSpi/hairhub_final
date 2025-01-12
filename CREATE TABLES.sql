@@ -17,7 +17,6 @@ CREATE TABLE Salons (
     zipcode TEXT NOT NULL,
     phone_number TEXT NOT NULL,
     email TEXT,
-    rating REAL CHECK (rating BETWEEN 1 AND 5),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (zipcode) REFERENCES Location(zipcode) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -72,17 +71,6 @@ CREATE TABLE Appointments (
     FOREIGN KEY (service_id) REFERENCES Services(service_id) ON DELETE CASCADE
 );
 
-CREATE TABLE Reviews (
-    review_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    salon_id INTEGER NOT NULL,
-    stylist_id INTEGER,
-    rating INTEGER CHECK (rating BETWEEN 1 AND 5),
-    comments TEXT,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (salon_id) REFERENCES Salons(salon_id) ON DELETE CASCADE,
-    FOREIGN KEY (stylist_id) REFERENCES Stylists(stylist_id) ON DELETE SET NULL
-);
 
 
 
