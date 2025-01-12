@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.hairhub</groupId>
-  <artifactId>salon</artifactId>
+  <artifactId>hairhub</artifactId>
   <version>1.0-SNAPSHOT</version>
 
   <properties>
