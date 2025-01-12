@@ -1,4 +1,4 @@
-package com.hairhub.Admin;
+package com.hairhub.Admin.Salon;
 import java.util.List;
 
 public class SalonService {

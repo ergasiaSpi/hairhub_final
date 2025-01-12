@@ -1,4 +1,4 @@
-package com.hairhub.Admin;
+package com.hairhub.Admin.Salon;
 
 import java.sql.*;
 import java.util.ArrayList;

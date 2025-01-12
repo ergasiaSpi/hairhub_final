@@ -1,4 +1,4 @@
-package com.hairhub.Admin;
+package com.hairhub.Admin.Salon;
 
 public class Salon {
   private int salonId;

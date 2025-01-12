@@ -1,4 +1,4 @@
-package com.hairhub.Admin;
+package com.hairhub.Admin.Service;
 
 public class Service {
 
