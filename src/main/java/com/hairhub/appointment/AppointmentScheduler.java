@@ -74,16 +74,24 @@ public class AppointmentScheduler {
     } else {
         throw new IllegalStateException("User is not signed in. Please log in to proceed.");
     }
+
+    // ΔΑΝΑΗ ΔΙΟΡΘΩΣΕ ΑΥΤΗΝ ΤΗΝ ΜΑΛΑΚΙΑ ΓΑΜΩ ΤΟ ΣΠΙΤΙ ΣΟΥ
+    private String getUserZipcode();
+    if(ZipcodeSessionManager.isZipcodeSet()) {
+        return ZipcodeSessionManager.getUserZipcode();
+    } else {
+        throw new IllegalStateException("User ZipCode is not available.");
+    }
 }
 
     // Method to calculate the distance between the user's location and the salon location
-    private double calculateDistance(int userZipcode, String salonZipcode) throws SQLException {
+    private double calculateDistance(String userZipcode, String salonZipcode) throws SQLException {
         String query = "SELECT latitude, longitude FROM Location WHERE zipcode = ?";
         double userLat = 0.0, userLon = 0.0, salonLat = 0.0, salonLon = 0.0;
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             // Get the user's latitude and longitude
-            stmt.setInt(1, userZipcode);
+            stmt.setString(1, userZipcode);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 userLat = rs.getDouble("latitude");
@@ -130,15 +138,8 @@ public class AppointmentScheduler {
                 }
             }
 
-            // ΔΑΝΑΗ ΔΙΟΡΘΩΣΕ ΑΥΤΗΝ ΤΗΝ ΜΑΛΑΚΙΑ ΓΑΜΩ ΤΟ ΣΠΙΤΙ ΣΟΥ
-            private String getUserZipcode();
-            if(ZipcodeSessionManager.isZipcodeSet()) {
-                return ZipcodeSessionManager.getUserZipcode();
-            } else {
-                throw new IllegalStateException("User ZipCode is not available.");
-            }
+            String userZipcode = getUserZipcode();       
 
-           
             double distance = calculateDistance(userZipcode, salonZipcode);
             System.out.println("Distance from your location to the salon: " + distance + " km");
 
