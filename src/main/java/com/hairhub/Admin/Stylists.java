@@ -1,8 +1,8 @@
  
-package com.ergasia;
+package com.hairhub.Admin;
 
 import java.sql.*;
-public class StylistDatabaseConnection {
+public class Stylists {
     String DB_URL = "jdbc:sqlite:C:\\Users\\n" + //
                 "ikol\\Documents\\GitHub\\hairhub_final\\hairhub.db"; // πλήρης διαδρομή
 
