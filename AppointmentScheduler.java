@@ -75,7 +75,10 @@ public class AppointmentSchedulerApp {
             String timeStart = timeParts[0].trim();
             String timeEnd = timeParts[1].trim();
 
-            boolean success = scheduler.bookAppointment(userId, salonId, stylistIndex, serviceId, appointmentDate, timeStart, timeEnd);
+            Appointment appointment = new Appointment();
+            int lastId = appointment.getLastAppointmentId(); 
+            
+            boolean success = scheduler.bookAppointment(lastId + 1, userId, salonId, stylistIndex, serviceId, appointmentDate, timeStart, timeEnd);
 
             if (success) {
                 System.out.println("Το ραντεβού κλείστηκε επιτυχώς!");
@@ -99,6 +102,27 @@ public class AppointmentSchedulerApp {
         System.out.println("Ψάχνεις για salon σε ποια περιοχή:");
         return scanner.next();
     }
+
+    public int getLastAppointmentId() throws SQLException {
+    int lastAppointmentId = 0;
+
+    String query = "SELECT appointment_id FROM appointments ORDER BY appointment_id DESC LIMIT 1";
+
+    try (Connection conn = DriverManager.getConnection(DB_SERVER, DB_USER, DB_PASSWORD);
+         Statement stmt = conn.createStatement();
+         ResultSet rs = stmt.executeQuery(query)) {
+
+        if (rs.next()) {
+            lastAppointmentId = rs.getInt("appointment_id");
+        }
+    } catch (SQLException e) {
+        System.err.println("Σφάλμα κατά την ανάκτηση του τελευταίου appointment_id: " + e.getMessage());
+        throw e;
+    }
+
+    return lastAppointmentId;
+}
+
 
     private void displaySalons(List<Salon> salons) {
         System.out.println("Salons στην περιοχή:");
