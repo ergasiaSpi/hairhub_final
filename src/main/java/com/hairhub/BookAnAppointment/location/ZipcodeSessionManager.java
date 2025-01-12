@@ -1,4 +1,4 @@
-package com.hairhub.location;
+package com.hairhub.BookAnAppointment.location;
 
 public class ZipcodeSessionManager {
     private static boolean isZipcodeSet = false;

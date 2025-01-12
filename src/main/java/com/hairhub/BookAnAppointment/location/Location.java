@@ -1,4 +1,4 @@
-package com.hairhub.location;
+package com.hairhub.BookAnAppointment.location;
 public class Location {
     private String zipcode;
     private double latitude;

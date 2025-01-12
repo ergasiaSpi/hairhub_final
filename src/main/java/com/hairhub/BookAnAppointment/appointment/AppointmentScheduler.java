@@ -1,4 +1,4 @@
-package com.hairhub.appointment;
+package com.hairhub.BookAnAppointment.appointment;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import com.hairhub.location.ZipcodeSessionManager;
+import com.hairhub.BookAnAppointment.location.ZipcodeSessionManager;
 import com.hairhub.sign_in_up.UserSessionManager;
 
 public class AppointmentScheduler {
