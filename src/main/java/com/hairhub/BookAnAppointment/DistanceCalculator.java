@@ -1,4 +1,4 @@
-package com.hairhub.BookAnAppointment.location;
+package com.hairhub.BookAnAppointment;
 import java.sql.*;
 
 public class DistanceCalculator {

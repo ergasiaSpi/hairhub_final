@@ -1,5 +1,5 @@
  
-package com.hairhub.Admin.Stylist;
+package com.hairhub.Admin;
 
 import java.sql.*;
 public class StylistDatabaseConnection {

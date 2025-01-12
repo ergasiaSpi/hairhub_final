@@ -1,4 +1,4 @@
-package com.hairhub.BookAnAppointment.appointment;
+package com.hairhub.BookAnAppointment;
 
 import java.sql.*;
 import java.util.ArrayList;
