@@ -22,7 +22,7 @@ public class HairhubApp {
             String username = UserInput.Get_Username();
             String password = UserInput.Get_Password();
 
-            // Authenticate the user
+           
             int userId = authenticateUser(connection, username, password);
             if (userId != -1) {
                 UserSessionManager.signInUser(userId);
@@ -125,7 +125,7 @@ public class HairhubApp {
 
                 case 2:
                     System.out.println("Fetching your latest appointment...");
-                    showLatestAppointment(connection, userId); // Fixed typo here
+                    showLatestAppointment(connection, userId); 
                     break;
 
                 case 3:
