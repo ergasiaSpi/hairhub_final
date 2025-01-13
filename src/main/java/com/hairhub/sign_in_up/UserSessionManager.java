@@ -33,6 +33,10 @@ public class UserSessionManager {
         }
     }
 
+    public static void setUserRole(String role) {
+        signedInUserRole = role;
+    }
+
     public static String getSignedInUserRole() {
         if (isUserSignedIn) {
             return signedInUserRole;

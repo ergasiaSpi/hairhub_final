@@ -1,8 +1,8 @@
 package com.hairhub.HairhubApp;
 
 import com.hairhub.sign_in_up.UserSessionManager;
-import com.hairhub.BookAnAppointment.AppointmentScheduler;
 import com.hairhub.sign_in_up.UserInput;
+import com.hairhub.BookAnAppointment.AppointmentScheduler;
 
 import java.sql.*;
 import java.util.Scanner;
@@ -18,49 +18,28 @@ public class HairhubApp {
 
             Scanner scanner = new Scanner(System.in);
 
-            
             System.out.println("Welcome to HairHub! Please log in.");
             String username = UserInput.Get_Username();
             String password = UserInput.Get_Password();
 
-           
+            // Authenticate the user
             int userId = authenticateUser(connection, username, password);
             if (userId != -1) {
                 UserSessionManager.signInUser(userId);
-                UserSessionManager.getSignedInUserRole();
+                String userRole = UserSessionManager.getSignedInUserRole();
 
-                System.out.printf("Hello, %s!%n", username);
+                System.out.printf("Hello, %s! You are logged in as a %s.%n", username, userRole);
 
                 
                 boolean exit = false;
                 while (!exit) {
-                    System.out.println("\nMenu:");
-                    System.out.println("1. Book an appointment");
-                    System.out.println("2. Show my latest appointment");
-                    System.out.println("3. Exit");
-                    System.out.print("Enter your choice: ");
-                    int choice = scanner.nextInt();
-
-                    switch (choice) {
-                        case 1:
-                            System.out.println("Redirecting to appointment booking...");
-                            bookAppointment(connection, userId);
-                            break;
-                            
-                        case 2:
-                            System.out.println("Fetching your latest appointment...");
-                            showLatestAppointment(connection, userId);
-                            break;
-
-                        case 3:
-                           System.out.println("Exiting application. Goodbye!");
-                           exit = true;
-                           break; 
-
-                        default:
-                            System.out.println("Invalid choice. Please try again.");
-                            break;
+                    if (userRole.equals("admin")) {
+                        showAdminMenu(scanner, connection, userId);
+                    } else if (userRole.equals("customer")) {
+                        showCustomerMenu(scanner, connection, userId);
                     }
+                    
+                    exit = true; 
                 }
 
                 UserSessionManager.signOutUser();
@@ -72,26 +51,96 @@ public class HairhubApp {
             System.out.println("Database connection failed: " + e.getMessage());
         }
     }
+
     private static int authenticateUser(Connection connection, String username, String password) {
-        String query = "SELECT user_id FROM Users WHERE username = ? AND user_password = ?";
+        String query = "SELECT user_id, role FROM Users WHERE username = ? AND user_password = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, username);
             pstmt.setString(2, password);
             ResultSet resultSet = pstmt.executeQuery();
 
             if (resultSet.next()) {
+                String role = resultSet.getString("role");
+                UserSessionManager.setUserRole(role);
                 return resultSet.getInt("user_id");
             }
         } catch (SQLException e) {
             System.out.println("Error authenticating user: " + e.getMessage());
         }
-        return -1; //authentication fails
+        return -1 ; 
+
+    private static void showAdminMenu(Scanner scanner, Connection connection, int userId) {
+        boolean exit = false;
+        while (!exit) {
+            System.out.println("\nAdmin Menu:");
+            System.out.println("1. View all users");
+            System.out.println("2. View all appointments");
+            System.out.println("3. Manage salons");
+            System.out.println("4. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.println("Viewing all users...");
+                    break;
+
+                case 2:
+                    System.out.println("Viewing all appointments...");
+                    viewAllAppointments(connection);
+                    break;
+
+                case 3:
+                    System.out.println("Redirecting to manage salons...");
+                    break;
+
+                case 4:
+                    System.out.println("Exiting admin interface.");
+                    exit = true;
+                    break;
+
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+                    break;
+            }
+        }
     }
 
-    
-    
+    private static void showCustomerMenu(Scanner scanner, Connection connection, int userId) {
+        boolean exit = false;
+        while (!exit) {
+            System.out.println("\nCustomer Menu:");
+            System.out.println("1. Book an appointment");
+            System.out.println("2. Show my latest appointment");
+            System.out.println("3. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
 
-     private static void bookAppointment(Connection connection, int userId) {
+            switch (choice) {
+                case 1:
+                    System.out.println("Redirecting to appointment booking...");
+                    bookAppointment(connection, userId); 
+                    break;
+
+                case 2:
+                    System.out.println("Fetching your latest appointment...");
+                    showLatestAppointment(connection, userId); /
+                    break;
+
+                case 3:
+                    System.out.println("Exiting application. Goodbye!");
+                    exit = true;
+                    break;
+
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+                    break;
+            }
+        }
+    }
+
+
+    private static void bookAppointment(Connection connection, int userId) {
         try {
             AppointmentScheduler scheduler = new AppointmentScheduler();
             scheduler.runScheduler();  // This will start the appointment booking process
@@ -104,11 +153,11 @@ public class HairhubApp {
     // Show the latest appointment for the user
     private static void showLatestAppointment(Connection connection, int userId) {
         String query = "SELECT A.appointment_id, A.date, A.time_start, S.name AS salon_name, SR.service " +
-                "FROM Appointments A " +
-                "JOIN Salons S ON A.salon_id = S.salon_id " +
-                "JOIN Services SR ON A.service_id = SR.service_id " +
-                "WHERE A.user_id = ? " +
-                "ORDER BY A.date DESC, A.time_start DESC LIMIT 1";
+                       "FROM Appointments A " +
+                       "JOIN Salons S ON A.salon_id = S.salon_id " +
+                       "JOIN Services SR ON A.service_id = SR.service_id " +
+                       "WHERE A.user_id = ? " +
+                       "ORDER BY A.date DESC, A.time_start DESC LIMIT 1";
 
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setInt(1, userId);
@@ -127,4 +176,5 @@ public class HairhubApp {
             System.out.println("Error fetching latest appointment: " + e.getMessage());
         }
     }
+}
 }
