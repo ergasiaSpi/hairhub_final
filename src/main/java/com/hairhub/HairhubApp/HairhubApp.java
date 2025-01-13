@@ -38,7 +38,7 @@ public class HairhubApp {
                         showCustomerMenu(scanner, connection, userId);
                     }
                     
-                    exit = true; // End the loop after one iteration (to exit the program)
+                    exit = true; 
                 }
 
                 UserSessionManager.signOutUser();
@@ -60,13 +60,13 @@ public class HairhubApp {
 
             if (resultSet.next()) {
                 String role = resultSet.getString("role");
-                UserSessionManager.setUserRole(role); // Set user role in session
+                UserSessionManager.setUserRole(role); 
                 return resultSet.getInt("user_id");
             }
         } catch (SQLException e) {
             System.out.println("Error authenticating user: " + e.getMessage());
         }
-        return -1; // authentication fails
+        return -1; 
     }
 
     private static void showAdminMenu(Scanner scanner, Connection connection, int userId) {
@@ -83,7 +83,7 @@ public class HairhubApp {
             switch (choice) {
                 case 1:
                     System.out.println("Viewing all users...");
-                    // Implement method to view all users
+                    
                     break;
 
                 case 2:
@@ -92,7 +92,7 @@ public class HairhubApp {
 
                 case 3:
                     System.out.println("Redirecting to manage salons...");
-                    // Implement method to manage salons
+                    
                     break;
 
                 case 4:
@@ -143,7 +143,7 @@ public class HairhubApp {
     private static void bookAppointment(Connection connection, int userId) {
         try {
             AppointmentScheduler scheduler = new AppointmentScheduler();
-            scheduler.runScheduler();  // This will start the appointment booking process
+            scheduler.runScheduler(); 
 
         } catch (SQLException e) {
             System.out.println("Error initializing Appointment Scheduler: " + e.getMessage());
