@@ -3,6 +3,7 @@ package com.hairhub.sign_in_up;
 public class UserSessionManager {
     private static boolean isUserSignedIn = false;
     private static int signedInUserId = -1;
+    private static String signedInUserRole = null;
 
     // Method to sign in a user
     public static void signInUser(int userId) {
@@ -27,6 +28,14 @@ public class UserSessionManager {
     public static int getSignedInUserId() {
         if (isUserSignedIn) {
             return signedInUserId;
+        } else {
+            throw new IllegalStateException("No user is signed in.");
+        }
+    }
+
+    public static String getSignedInUserRole() {
+        if (isUserSignedIn) {
+            return signedInUserRole;
         } else {
             throw new IllegalStateException("No user is signed in.");
         }
