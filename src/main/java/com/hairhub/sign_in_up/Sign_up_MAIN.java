@@ -1,7 +1,7 @@
 package com.hairhub.sign_in_up;
 
 public class Sign_up_MAIN {
-    public static void main(String[] args) {
+    public static void GetInput2(){
         String username = UserInput.Get_Username();
         String password = UserInput.Get_Password();
         String phone = UserInput.Get_Phone();

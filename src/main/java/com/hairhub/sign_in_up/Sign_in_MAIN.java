@@ -4,9 +4,9 @@ import java.util.Scanner;
 
 public class Sign_in_MAIN {
 
-    private static Scanner input = new Scanner(System.in);
+    static Scanner input = new Scanner(System.in);
 
-    private static void Get_Input() {
+    public static void Get_Input() {
         String Username = " ";
         String Password = " ";
         do{
@@ -17,7 +17,4 @@ public class Sign_in_MAIN {
         } while (SQL_CON.SQL_SELECT(Username, Password)==false);
     }
     
-    public static void main(String[] args) {
-        Get_Input();
-    }
 }
