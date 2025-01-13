@@ -30,7 +30,6 @@ public class HairhubApp {
 
                 System.out.printf("Hello, %s! You are logged in as a %s.%n", username, userRole);
 
-                
                 boolean exit = false;
                 while (!exit) {
                     if (userRole.equals("admin")) {
@@ -39,7 +38,7 @@ public class HairhubApp {
                         showCustomerMenu(scanner, connection, userId);
                     }
                     
-                    exit = true; 
+                    exit = true; // End the loop after one iteration (to exit the program)
                 }
 
                 UserSessionManager.signOutUser();
@@ -61,13 +60,14 @@ public class HairhubApp {
 
             if (resultSet.next()) {
                 String role = resultSet.getString("role");
-                UserSessionManager.setUserRole(role);
+                UserSessionManager.setUserRole(role); // Set user role in session
                 return resultSet.getInt("user_id");
             }
         } catch (SQLException e) {
             System.out.println("Error authenticating user: " + e.getMessage());
         }
-        return -1 ; 
+        return -1; // authentication fails
+    }
 
     private static void showAdminMenu(Scanner scanner, Connection connection, int userId) {
         boolean exit = false;
@@ -83,15 +83,16 @@ public class HairhubApp {
             switch (choice) {
                 case 1:
                     System.out.println("Viewing all users...");
+                    // Implement method to view all users
                     break;
 
                 case 2:
                     System.out.println("Viewing all appointments...");
-                    viewAllAppointments(connection);
                     break;
 
                 case 3:
                     System.out.println("Redirecting to manage salons...");
+                    // Implement method to manage salons
                     break;
 
                 case 4:
@@ -124,7 +125,7 @@ public class HairhubApp {
 
                 case 2:
                     System.out.println("Fetching your latest appointment...");
-                    showLatestAppointment(connection, userId); /
+                    showLatestAppointment(connection, userId); // Fixed typo here
                     break;
 
                 case 3:
@@ -138,7 +139,6 @@ public class HairhubApp {
             }
         }
     }
-
 
     private static void bookAppointment(Connection connection, int userId) {
         try {
@@ -176,5 +176,4 @@ public class HairhubApp {
             System.out.println("Error fetching latest appointment: " + e.getMessage());
         }
     }
-}
 }
