@@ -1,17 +1,16 @@
--- Εισαγωγή 4 πρώτων κομμωτηρίων με πραγματικούς ΤΚ στον πίνακα Salons
-INSERT INTO Salons (name, address, zipcode, phone_number, email)
-VALUES
-    ('Διονυσία', 'Μυκηνών 2 (Λεωφ. Συγγρού 286), Καλλιθέα, Αττική', '17674', '2101234567', 'contact@dionysia.com'),
-    ('Hair Salon', 'Αγράφων 57, 131 23 Πετρούπολη, Αττική', '13231', '2102345678', 'contact@hairsalon.com'),
-    ('Χαρά Κομμωτήριο', 'Καλλιθέα, Αττική', '17674', '2103456789', 'contact@charahairsalon.com'),
-    ('Salon de Beaute', 'Νυμφασίας 6, Αττική', '10443', '2104567890', 'contact@salondebeaute.com');
+INSERT INTO Users (username, user_password, email, phone, zipcode, role)
+VALUES ('adminnn1', 'passworD1$1', 'admin1@example.com', '+932-093-0984', 11111, 'admin'),
+       ('customer1', 'passworD2#2', 'customer1@example.com', '+934-032-0922', 22222, 'customer');
 
--- Εισαγωγή 4 επιπλέον κομμωτηρίων με πραγματικούς ΤΚ στον πίνακα Salons
-INSERT INTO Salons (name, address, zipcode, phone_number, email)
-VALUES
-    ('Notas Beauty Salon', 'Άνω Πατήσια, Αθήνα, Ελλάδα', '11472', '2107654321', 'contact@notasbeautysalon.com'),
-    ('Mind The Barbers', 'Βύρωνας, Αθήνα, Ελλάδα', '16232', '2108765432', 'contact@mindthebarbers.com'),
-    ('EMAIL STYLE', 'Άνω Πατήσια, Αθήνα, Ελλάδα', '11472', '2109876543', 'contact@emailstyle.com'),
-    ('NOUVEAUTE DE BEAUTE - ΚΑΤΣΑΝΤΩΝΗ ΔΙΟΝΥΣΙΑ', 'Νέος Κόσμος, Αθήνα, Ελλάδα', '11743', '2101234568', 'contact@nouveautedebeautesalon.com');
+INSERT INTO Salons (admin_id, name, address, zipcode, phone_number, email)
+VALUES (1, 'HairHub Downtown', '123 Main St', '11111', '1234567890', 'downtown@hairhub.com');
 
+-- Προσθήκη stylists
+INSERT INTO Stylists (stylist_name, salon_id, specializations, shift_start, shift_end)
+VALUES ('Stylist A', 1, 'Haircut, Color', '09:00:00', '17:00:00'),
+       ('Stylist B', 1, 'Styling, Highlights', '10:00:00', '18:00:00');
 
+-- Προσθήκη υπηρεσιών
+INSERT INTO Services (service, service_type, price, duration)
+VALUES ('Haircut', 'Basic', 20.00, '00:30:00'),
+       ('Coloring', 'Premium', 50.00, '01:00:00');

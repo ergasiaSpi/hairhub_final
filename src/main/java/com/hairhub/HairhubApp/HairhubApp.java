@@ -1,8 +1,10 @@
 package com.hairhub.HairhubApp;
 
 import com.hairhub.sign_in_up.UserSessionManager;
+import com.hairhub.sign_in_up.SQL_CON;
 import com.hairhub.sign_in_up.UserInput;
 import com.hairhub.BookAnAppointment.AppointmentScheduler;
+import java.time.LocalDate;
 
 import java.sql.*;
 import java.util.Scanner;
@@ -18,37 +20,73 @@ public class HairhubApp {
 
             Scanner scanner = new Scanner(System.in);
 
-            System.out.println("Welcome to HairHub! Please log in.");
-            String username = UserInput.Get_Username();
-            String password = UserInput.Get_Password();
+            System.out.println("Welcome to HairHub! Please choose an option:");
+            
+            
+                System.out.println("1. Sign In");
+                System.out.println("2. Sign Up");
+                System.out.println("3. Exit");
+                System.out.print("Enter your choice: ");
+                int choice = scanner.nextInt();
 
-           
-            int userId = authenticateUser(connection, username, password);
-            if (userId != -1) {
-                UserSessionManager.signInUser(userId);
-                String userRole = UserSessionManager.getSignedInUserRole();
+                switch (choice) {
+                    case 1:
+                        signInProcess(connection, scanner);
+                        break;
 
-                System.out.printf("Hello, %s! You are logged in as a %s.%n", username, userRole);
+                    case 2:
+                        signUpProcess(connection, scanner);
+                        break;
 
-                boolean exit = false;
-                while (!exit) {
-                    if (userRole.equals("admin")) {
-                        showAdminMenu(scanner, connection, userId);
-                    } else if (userRole.equals("customer")) {
-                        showCustomerMenu(scanner, connection, userId);
-                    }
-                    
-                    exit = true; 
-                }
+                    case 3:
+                        System.out.println("Exiting application. Goodbye!");
+                        break;
 
-                UserSessionManager.signOutUser();
-            } else {
-                System.out.println("Invalid username or password. Please try again.");
+                    default:
+                        System.out.println("Invalid choice. Please try again.");
+                        break;
+                
             }
 
         } catch (SQLException e) {
             System.out.println("Database connection failed: " + e.getMessage());
         }
+    }
+
+    private static void signInProcess(Connection connection, Scanner scanner) {
+        System.out.println("Please log in.");
+        String username = UserInput.Get_Username();
+        String password = UserInput.Get_Password();
+        SQL_CON.SQL_SELECT(username, password);
+
+        int userId = authenticateUser(connection, username, password);
+        if (userId != -1) {
+            UserSessionManager.signInUser(userId);
+            String userRole = UserSessionManager.getSignedInUserRole();
+
+            System.out.printf("Hello, %s! You are logged in as a %s.%n", username, userRole);
+            showRoleBasedMenu(scanner, connection, userId, userRole);
+        } else {
+            System.out.println("Invalid username or password. Please try again.");
+        }
+    }
+
+    private static void signUpProcess(Connection connection, Scanner scanner) {
+        // Assuming you will add the logic for sign up
+        System.out.println("Please sign up.");
+        String username = UserInput.Get_Username();
+        String password = UserInput.Get_Password();
+        String phone = UserInput.Get_Phone();
+        String email = UserInput.Get_Email();
+        String zip_code = UserInput.Get_Postcode();
+        String role = UserInput.Get_Role();
+        SQL_CON.SQL_INSERT(username, password, email, phone, zip_code, role);
+
+        // Add sign-up logic here, such as inserting new user into the database
+        // If successful, then proceed to sign-in process after sign-up
+
+        System.out.println("Sign up successful. Please Sign in. ");
+        signInProcess(connection, scanner);
     }
 
     private static int authenticateUser(Connection connection, String username, String password) {
@@ -69,6 +107,19 @@ public class HairhubApp {
         return -1; 
     }
 
+    private static void showRoleBasedMenu(Scanner scanner, Connection connection, int userId, String userRole) {
+        boolean exit = false;
+        while (!exit) {
+            if (userRole.equals("admin")) {
+                showAdminMenu(scanner, connection, userId);
+            } else if (userRole.equals("customer")) {
+                showCustomerMenu(scanner, connection, userId);
+            }
+
+            
+        }
+    }
+
     private static void showAdminMenu(Scanner scanner, Connection connection, int userId) {
         boolean exit = false;
         while (!exit) {
@@ -76,27 +127,28 @@ public class HairhubApp {
             System.out.println("1. View all users");
             System.out.println("2. View all appointments");
             System.out.println("3. Manage salons");
-            System.out.println("4. Exit");
+            System.out.println("4. Sign Out");
             System.out.print("Enter your choice: ");
             int choice = scanner.nextInt();
 
             switch (choice) {
                 case 1:
                     System.out.println("Viewing all users...");
-                    
+                    SQL_CON.View_Users();
                     break;
 
                 case 2:
                     System.out.println("Viewing all appointments...");
+                    SQL_CON.viewAppointmentsByAdmin(choice);
                     break;
 
                 case 3:
                     System.out.println("Redirecting to manage salons...");
-                    
                     break;
 
                 case 4:
-                    System.out.println("Exiting admin interface.");
+                    System.out.println("Signing out...");
+                    UserSessionManager.signOutUser();
                     exit = true;
                     break;
 
@@ -113,23 +165,24 @@ public class HairhubApp {
             System.out.println("\nCustomer Menu:");
             System.out.println("1. Book an appointment");
             System.out.println("2. Show my latest appointment");
-            System.out.println("3. Exit");
+            System.out.println("3. Sign Out");
             System.out.print("Enter your choice: ");
             int choice = scanner.nextInt();
 
             switch (choice) {
                 case 1:
                     System.out.println("Redirecting to appointment booking...");
-                    bookAppointment(connection, userId); 
+                    bookAppointment(connection, userId);
                     break;
 
                 case 2:
                     System.out.println("Fetching your latest appointment...");
-                    showLatestAppointment(connection, userId); 
+                    showLatestAppointment(connection, userId);
                     break;
 
                 case 3:
-                    System.out.println("Exiting application. Goodbye!");
+                    System.out.println("Signing out...");
+                    UserSessionManager.signOutUser();
                     exit = true;
                     break;
 
@@ -142,15 +195,21 @@ public class HairhubApp {
 
     private static void bookAppointment(Connection connection, int userId) {
         try {
+            SQL_CON.showSalons(connection);
+            int salon_id = AppointmentScheduler.chooseSalon();
+            SQL_CON.showStylists(connection, salon_id);
+            int stylist_id = AppointmentScheduler.chooseStylist();
+            SQL_CON.showServices(connection);
+            int service_id = AppointmentScheduler.chooseService(connection);
+            LocalDate date = AppointmentScheduler.ChooseDate();
+
             AppointmentScheduler scheduler = new AppointmentScheduler();
             scheduler.runScheduler(); 
-
         } catch (SQLException e) {
             System.out.println("Error initializing Appointment Scheduler: " + e.getMessage());
         }
     }
 
-    // Show the latest appointment for the user
     private static void showLatestAppointment(Connection connection, int userId) {
         String query = "SELECT A.appointment_id, A.date, A.time_start, S.name AS salon_name, SR.service " +
                        "FROM Appointments A " +

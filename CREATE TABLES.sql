@@ -1,5 +1,7 @@
+-- Ενεργοποίηση Foreign Key Constraints
 PRAGMA foreign_keys = ON;
 
+-- Δημιουργία πίνακα Users
 CREATE TABLE Users (
     user_id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT NOT NULL,
@@ -10,24 +12,19 @@ CREATE TABLE Users (
     role TEXT CHECK (role IN ('admin', 'customer'))
 );
 
+-- Δημιουργία πίνακα Salons
 CREATE TABLE Salons (
     salon_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    admin_id INTEGER NOT NULL,
     name TEXT NOT NULL,
     address TEXT NOT NULL,
     zipcode TEXT NOT NULL,
     phone_number TEXT NOT NULL,
     email TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (zipcode) REFERENCES Location(zipcode) ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY (admin_id) REFERENCES Users(user_id)
 );
 
-CREATE TABLE Location (
-    zipcode TEXT PRIMARY KEY,
-    territory TEXT NOT NULL,
-    longtitude REAL NOT NULL,
-    latitude REAL NOT NULL
-);
-
+-- Δημιουργία πίνακα Stylists
 CREATE TABLE Stylists (
     stylist_id INTEGER PRIMARY KEY AUTOINCREMENT,
     stylist_name TEXT NOT NULL,
@@ -38,14 +35,16 @@ CREATE TABLE Stylists (
     FOREIGN KEY (salon_id) REFERENCES Salons(salon_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+-- Δημιουργία πίνακα Services
 CREATE TABLE Services (
     service_id INTEGER PRIMARY KEY AUTOINCREMENT,
     service TEXT NOT NULL,
     service_type TEXT,
     price REAL NOT NULL,
-    duration TIME NOT NULL -- σε λεπτά
+    duration TIME NOT NULL
 );
 
+-- Δημιουργία πίνακα AvailabilitybyStylist
 CREATE TABLE AvailabilitybyStylist (
     availability_id INTEGER PRIMARY KEY AUTOINCREMENT,
     stylist_id INTEGER NOT NULL,
@@ -56,6 +55,7 @@ CREATE TABLE AvailabilitybyStylist (
     UNIQUE (stylist_id, appoint_date, time_start)
 );
 
+-- Δημιουργία πίνακα Appointments
 CREATE TABLE Appointments (
     appointment_id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
@@ -71,6 +71,13 @@ CREATE TABLE Appointments (
     FOREIGN KEY (service_id) REFERENCES Services(service_id) ON DELETE CASCADE
 );
 
+-- Δημιουργία πίνακα Location
+CREATE TABLE Location (
+    zipcode TEXT PRIMARY KEY,
+    territory TEXT NOT NULL,
+    longtitude REAL NOT NULL,
+    latitude REAL NOT NULL
+);
 
 
 
