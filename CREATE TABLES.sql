@@ -12,6 +12,7 @@ CREATE TABLE Users (
 
 CREATE TABLE Salons (
     salon_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    admin_id INTEGER NOT NULL,
     name TEXT NOT NULL,
     address TEXT NOT NULL,
     zipcode TEXT NOT NULL,
