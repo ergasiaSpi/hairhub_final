@@ -21,10 +21,16 @@ CREATE TABLE Salons (
     zipcode TEXT NOT NULL,
     phone_number TEXT NOT NULL,
     email TEXT,
-    FOREIGN KEY (admin_id) REFERENCES Users(user_id)
+    FOREIGN KEY (zipcode) REFERENCES Location(zipcode) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Δημιουργία πίνακα Stylists
+CREATE TABLE Location (
+    zipcode TEXT PRIMARY KEY,
+    territory TEXT NOT NULL,
+    longtitude REAL NOT NULL,
+    latitude REAL NOT NULL
+);
+
 CREATE TABLE Stylists (
     stylist_id INTEGER PRIMARY KEY AUTOINCREMENT,
     stylist_name TEXT NOT NULL,
