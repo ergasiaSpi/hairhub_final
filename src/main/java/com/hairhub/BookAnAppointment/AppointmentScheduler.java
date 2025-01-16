@@ -8,6 +8,7 @@ import java.util.Scanner;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
+
 import com.hairhub.sign_in_up.UserSessionManager;
 
 public class AppointmentScheduler {
@@ -21,25 +22,7 @@ public class AppointmentScheduler {
     }
 
     // Method to book an appointment
-      public boolean bookAppointment(int userId, int salonId, int stylistId, int serviceId, 
-                                   LocalDate date, LocalTime timeStart, LocalTime timeEnd) {
-        String query = "INSERT INTO Appointments (appointment_id, user_id, salon_id, stylist_id, service_id, date, time_start, time_end) " +
-                       "VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, userId);
-            stmt.setInt(2, salonId);
-            stmt.setInt(3, stylistId);
-            stmt.setInt(4, serviceId);
-            stmt.setDate(5, java.sql.Date.valueOf(date));
-            stmt.setTime(6, java.sql.Time.valueOf(timeStart));
-            stmt.setTime(7, java.sql.Time.valueOf(timeEnd));
-            int rowsInserted = stmt.executeUpdate();
-            return rowsInserted > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
+    
 
     // Method to get stylists by salon ID
     private List<String> getStylistsBySalonId(int salonId) throws SQLException {
@@ -295,103 +278,143 @@ public class AppointmentScheduler {
         return validDate;
     }
 
-
-
-
-    // Method to run the appointment scheduler
-    public void runScheduler() {
-        try (Scanner scanner = new Scanner(System.in)) {
-            int userId = getSignedInUserId();
-
-            // Get salon selection
-            System.out.println("Enter the salon ID you wish to choose:");
-            int salonId = scanner.nextInt();
-
-            // Get salon zipcode from database
-            String salonZipcode = "";
-            String query = "SELECT stylist_name FROM Salons WHERE salon_id = ?";
-            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                stmt.setInt(1, salonId);
-                ResultSet rs = stmt.executeQuery();
-                if (rs.next()) {
-                    salonZipcode = rs.getString("stylist_name");
-                }
-            }
-
-            String userZipcode = ZipcodeSessionManager.getUserZipcode();       
-
-            double distance = calculateDistance(userZipcode, salonZipcode);
-            System.out.println("Distance from your location to the salon: " + distance + " km");
-
-            // Check if salon is within a desired range (e.g., 10 km)
-            if (distance > 10) {
-                System.out.println("The salon is too far away from your location. Please choose a closer salon.");
-                return;
-            }
-
-            // Fetch stylists by salon ID
-            List<String> stylists = getStylistsBySalonId(salonId);
-            System.out.println("Stylists for salon ID " + salonId + ":");
-            for (int i = 0; i < stylists.size(); i++) {
-                System.out.println((i + 1) + ". " + stylists.get(i));
-            }
-
-            System.out.println("Choose a stylist by number:");
-            int stylistChoice = scanner.nextInt();
-            String stylistName = stylists.get(stylistChoice - 1);
-
-            // Fetch available services
-            List<String> services = getServices();
-            System.out.println("Available services:");
-            for (int i = 0; i < services.size(); i++) {
-                System.out.println((i + 1) + ". " + services.get(i));
-            }
-
-            System.out.println("Choose a service by number:");
-            int serviceChoice = scanner.nextInt();
-            String serviceType = services.get(serviceChoice - 1);
-
-            // Get appointment date
-            System.out.println("Enter appointment date (YYYY-MM-DD):");
-            String appointmentDate = scanner.next();
-
-            // Use CheckAvailability to find available time slots
+    public static TimeSlot ChooseTime(int stylist_id, String appoint_date, int serviceid) {
+        Scanner scanner = new Scanner(System.in);
+        
+        
+        try {
+            // Λήψη διαθέσιμων ωρών
             CheckAvailability checkAvailability = new CheckAvailability(DATABASE_URL);
-            List<String> availableTimeSlots = checkAvailability.FindTime(stylistName, appointmentDate, serviceType);
+            List<String> availableTimeSlots = checkAvailability.FindTime(stylist_id, appoint_date, serviceid);
+            
+            // Αν δεν υπάρχουν διαθέσιμες ώρες
             if (availableTimeSlots.isEmpty()) {
                 System.out.println("No available time slots for the selected stylist, date, and service.");
-                return;
+                return null;  // Επιστροφή null αν δεν υπάρχουν διαθέσιμες ώρες
             }
-
-            // Display available time slots
+    
+            // Εμφάνιση διαθέσιμων ωρών
             System.out.println("Available time slots:");
             for (int i = 0; i < availableTimeSlots.size(); i++) {
                 System.out.println((i + 1) + ". " + availableTimeSlots.get(i));
             }
-
-            // Select time slot
+    
+            // Επιλογή ώρας από τον χρήστη
             System.out.println("Choose a time slot by number:");
-            int timeSlotChoice = scanner.nextInt();
-            String chosenTimeSlot = availableTimeSlots.get(timeSlotChoice - 1);
-            String[] timeParts = chosenTimeSlot.split("-");
-            LocalTime timeStart = LocalTime.parse(timeParts[0]);
-            LocalTime timeEnd = LocalTime.parse(timeParts[1]);
-
-            // ΝΕΦΕΛΗ ΔΕΣ ΤΙ ΠΑΙΖΕΙ ΕΔΩ 
-            boolean success = bookAppointment( userId, salonId, stylistChoice, serviceChoice, 
-                                              LocalDate.parse(appointmentDate), timeStart, timeEnd);
-            if (success) {
-                System.out.println("Appointment successfully booked!");
-            } else {
-                System.out.println("Failed to book the appointment.");
+            int timeSlotChoice = -1;
+            
+            // Έλεγχος εγκυρότητας εισόδου για την επιλογή του χρήστη
+            while (timeSlotChoice < 1 || timeSlotChoice > availableTimeSlots.size()) {
+                if (scanner.hasNextInt()) {
+                    timeSlotChoice = scanner.nextInt();
+                    if (timeSlotChoice < 1 || timeSlotChoice > availableTimeSlots.size()) {
+                        System.out.println("Invalid choice. Please select a valid time slot number.");
+                    }
+                } else {
+                    System.out.println("Invalid input. Please enter a number.");
+                    scanner.next(); // Καθαρίζει την μη έγκυρη είσοδο
+                }
             }
+    
+            // Ανάλυση του επιλεγμένου χρόνου
+            String TimeStartstr = availableTimeSlots.get(timeSlotChoice - 1);
+            LocalTime TimeStart = LocalTime.parse(TimeStartstr);
+            String TimeEndstr = availableTimeSlots.get(timeSlotChoice);
+            LocalTime TimeEnd = LocalTime.parse(TimeEndstr);
 
-            // Close CheckAvailability connection
-            checkAvailability.close();
+            return new TimeSlot(TimeStart, TimeEnd);
 
+            
+
+
+           
+    
+        } catch (SQLException e) {
+            // Χειρισμός εξαιρέσεων που σχετίζονται με την βάση δεδομένων
+            System.out.println("Database error: " + e.getMessage());
+        } catch (DateTimeParseException e) {
+            // Χειρισμός εξαιρέσεων κατά την ανάλυση ημερομηνίας/ώρας
+            System.out.println("Invalid time format: " + e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            // Γενικός χειρισμός για άλλες εξαιρέσεις
+            System.out.println("An error occurred: " + e.getMessage());
+        }
+    
+        return null; // Επιστροφή null σε περίπτωση σφάλματος
+    }
+    
+    public static void isValidAppointment(boolean successfulBooking, int user_id, int stylist_id, int salon_id, int service_id, Connection connection) {
+        String query = "SELECT A.date, A.time_start, S.name AS salon_name, SR.service, ST.stylist_name " +
+                       "FROM Appointments A " +
+                       "JOIN Salons S ON A.salon_id = S.salon_id " +
+                       "JOIN Services SR ON A.service_id = SR.service_id " +
+                       "JOIN Stylists ST ON A.stylist_id = ST.stylist_id " +
+                       "WHERE A.user_id = ? AND S.salon_id = ? AND ST.stylist_id = ? AND SR.service_id = ?" +
+                       "ORDER BY A.date DESC, A.time_start DESC LIMIT 1";
+    
+        if (successfulBooking) {
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                // Βάζουμε την παράμετρο user_id πριν την εκτέλεση του query
+                stmt.setInt(1, user_id);
+                stmt.setInt(2, salon_id);
+                stmt.setInt(3, stylist_id);
+                stmt.setInt(4, service_id);
+    
+                try (ResultSet resultSet = stmt.executeQuery()) {
+                    // Ελέγχουμε αν υπάρχει εγγραφή στο ResultSet
+                    if (resultSet.next()) {
+                        // Εμφάνιση λεπτομερειών ραντεβού
+                        System.out.println("\nAppointment details:");                   
+                        System.out.printf("Date: %s%n", resultSet.getString("date"));
+                        System.out.printf("Time: %s%n", resultSet.getString("time_start"));
+                        System.out.printf("Salon: %s%n", resultSet.getString("salon_name"));
+                        System.out.printf("Service: %s%n", resultSet.getString("service"));
+                        System.out.printf("Stylist: %s%n", resultSet.getString("stylist_name"));
+                    } else {
+                        System.out.println("No appointment found for the given user.");
+                    }
+                }
+            } catch (SQLException e) {
+                System.out.println("Error fetching latest appointment: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Failed to book the appointment");
         }
     }
-}
+    
+    public static LocalTime Get_ServiceDuration (Connection connection, int service_id) throws SQLException {
+        // SQL query για να πάρουμε το service_type από τον πίνακα Services
+        String query = "SELECT duration FROM Services WHERE service_id = ?";
+        
+        // Προετοιμασία της δήλωσης για το query
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            // Ορισμός του service_id στο prepared statement
+            pstmt.setInt(1, service_id);
+    
+            // Εκτέλεση του query και λήψη των αποτελεσμάτων
+            ResultSet rs = pstmt.executeQuery();
+    
+            // Αν το αποτέλεσμα δεν είναι κενό (δηλαδή βρέθηκε το service_id στη βάση)
+            if (rs.next()) {
+                return rs.getTime("duration").toLocalTime();
+            } else {
+                // Αν δεν βρεθεί το service_id στη βάση, ρίχνουμε εξαίρεση
+                throw new SQLException("Service duration not found with the given ID");
+            }
+        }
+    }
+    public static LocalTime parseTimeWithSeconds(String timeString) {
+        // Έλεγχος αν το String είναι στη μορφή HH:mm (χωρίς δευτερόλεπτα)
+        if (timeString.length() == 5) { // Μορφή HH:mm
+            timeString += ":00"; // Προσθήκη των δευτερολέπτων
+        }
+        
+        // Χρησιμοποίηση του LocalTime.parse με το σωστό formatter
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        return LocalTime.parse(timeString, formatter);
+    }
 
+}  
+
+    // Method to run the appointment scheduler
+   

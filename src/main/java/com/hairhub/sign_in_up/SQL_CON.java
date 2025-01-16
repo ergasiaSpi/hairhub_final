@@ -1,9 +1,11 @@
 package com.hairhub.sign_in_up;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class SQL_CON {
-
+  
     public static void SQL_INSERT(String Username, String Password, String email, String phone, String postal_code, String role) {
         
         String Query = "INSERT INTO Users (username, user_password, email, phone, postal_code, role) VALUES (?, ?, ?, ?, ?, ?)";
@@ -140,8 +142,11 @@ public class SQL_CON {
                 int stylistId = resultSet.getInt("stylist_id");
                 String stylistName = resultSet.getString("stylist_name");
                 String specializations = resultSet.getString("specializations");
-                Time shiftStart = resultSet.getTime("shift_start");
-                Time shiftEnd = resultSet.getTime("shift_end");
+                String shiftStartStr = resultSet.getString("shift_start");
+                LocalTime shiftStart = LocalTime.parse(shiftStartStr);
+                String shiftEndStr = resultSet.getString("shift_end");
+                LocalTime shiftEnd = LocalTime.parse(shiftEndStr);
+
 
                 // Εμφανίζουμε τις πληροφορίες του κάθε stylist
                 System.out.println("Stylist ID: " + stylistId);
@@ -177,7 +182,8 @@ public class SQL_CON {
                 int serviceId = resultSet.getInt("service_id");
                 String serviceName = resultSet.getString("service");
                 double price = resultSet.getDouble("price");
-                Time duration = resultSet.getTime("duration");
+                String durationstr = resultSet.getString("duration");
+                LocalTime duration = LocalTime.parse(durationstr);
 
                 // Εμφανίζουμε τις πληροφορίες για κάθε υπηρεσία
                 System.out.println("Service ID: " + serviceId);
@@ -189,6 +195,51 @@ public class SQL_CON {
 
         } catch (SQLException e) {
             System.out.println("Error fetching services: " + e.getMessage());
+        }
+    }
+
+      public static boolean INSTERT_Appointment(int userId, int salonId, int stylistId, int serviceId, 
+                                   String date, LocalTime timeStart, Connection connection) {
+        String query = "INSERT INTO Appointments (user_id, salon_id, stylist_id, service_id, date, time_start) " +
+                       "VALUES (?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, userId);
+            stmt.setInt(2, salonId);
+            stmt.setInt(3, stylistId);
+            stmt.setInt(4, serviceId);
+            stmt.setString(5, date);
+            stmt.setString(6, timeStart.toString());
+            int rowsInserted = stmt.executeUpdate();
+            return rowsInserted > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static void insertAvailability(int stylistId, String appointDate, LocalTime timeStart, LocalTime timeEnd, Connection connection) {
+        String insertQuery = "INSERT INTO AvailabilitybyStylist (stylist_id, appoint_date, time_start, time_end) "
+                           + "VALUES (?, ?, ?, ?);";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery))
+              {
+
+            // Ορισμός των τιμών για τα ερωτηματικά (?)
+            preparedStatement.setInt(1, stylistId);
+            preparedStatement.setString(2, appointDate);
+            preparedStatement.setString(3, timeStart.toString());
+            preparedStatement.setString(4, timeEnd.toString());
+
+            // Εκτέλεση της εντολής INSERT
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+               return;
+            } else {
+                System.out.println("Failed to insert availability.");
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Database error: " + e.getMessage());
         }
     }
 

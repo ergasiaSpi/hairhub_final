@@ -28,8 +28,8 @@ public class Constrictions {
 
     // Ελέγχει το Password
     public static boolean Password_Constrictions(String Password) {
-        if (Password.length() < 8 || Password.length() > 15) {
-            System.out.println("The password must be between 8 and 15 characters.");
+        if (Password.length() < 8 || Password.length() > 20) {
+            System.out.println("The password must be between 8 and 20 characters.");
             return false;
         }
 
