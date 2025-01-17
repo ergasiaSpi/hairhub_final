@@ -4,10 +4,8 @@ import com.hairhub.sign_in_up.UserSessionManager;
 import com.hairhub.sign_in_up.SQL_CON;
 import com.hairhub.sign_in_up.UserInput;
 import com.hairhub.BookAnAppointment.AppointmentScheduler;
-import com.hairhub.BookAnAppointment.TimeSlot;
-
 import java.time.LocalDate;
-import java.time.LocalTime;
+
 import java.sql.*;
 import java.util.Scanner;
 
@@ -19,7 +17,6 @@ public class HairhubApp {
             if (connection != null) {
                 System.out.println("Connected to the database successfully!");
             }
-            
 
             Scanner scanner = new Scanner(System.in);
 
@@ -31,6 +28,7 @@ public class HairhubApp {
                 System.out.println("3. Exit");
                 System.out.print("Enter your choice: ");
                 int choice = scanner.nextInt();
+
                 switch (choice) {
                     case 1:
                         signInProcess(connection, scanner);
@@ -38,7 +36,6 @@ public class HairhubApp {
 
                     case 2:
                         signUpProcess(connection, scanner);
-
                         break;
 
                     case 3:
@@ -47,20 +44,16 @@ public class HairhubApp {
 
                     default:
                         System.out.println("Invalid choice. Please try again.");
-
-                        break;}
-
+                        break;
                 
-            
-                
-            
+            }
 
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             System.out.println("Database connection failed: " + e.getMessage());
         }
     }
 
-    private static boolean signInProcess(Connection connection, Scanner scanner) {
+    private static void signInProcess(Connection connection, Scanner scanner) {
         System.out.println("Please log in.");
         String username = UserInput.Get_Username();
         String password = UserInput.Get_Password();
@@ -73,10 +66,8 @@ public class HairhubApp {
 
             System.out.printf("Hello, %s! You are logged in as a %s.%n", username, userRole);
             showRoleBasedMenu(scanner, connection, userId, userRole);
-            return true;
         } else {
             System.out.println("Invalid username or password. Please try again.");
-            return false;
         }
     }
 
@@ -117,12 +108,17 @@ public class HairhubApp {
     }
 
     private static void showRoleBasedMenu(Scanner scanner, Connection connection, int userId, String userRole) {
+        boolean exit = false;
+        while (!exit) {
             if (userRole.equals("admin")) {
                 showAdminMenu(scanner, connection, userId);
             } else if (userRole.equals("customer")) {
                 showCustomerMenu(scanner, connection, userId);
             }
-         }
+
+            
+        }
+    }
 
     private static void showAdminMenu(Scanner scanner, Connection connection, int userId) {
         boolean exit = false;
@@ -164,12 +160,15 @@ public class HairhubApp {
     }
 
     private static void showCustomerMenu(Scanner scanner, Connection connection, int userId) {
+        boolean exit = false;
+        while (!exit) {
             System.out.println("\nCustomer Menu:");
             System.out.println("1. Book an appointment");
             System.out.println("2. Show my latest appointment");
             System.out.println("3. Sign Out");
             System.out.print("Enter your choice: ");
             int choice = scanner.nextInt();
+
             switch (choice) {
                 case 1:
                     System.out.println("Redirecting to appointment booking...");
@@ -184,16 +183,18 @@ public class HairhubApp {
                 case 3:
                     System.out.println("Signing out...");
                     UserSessionManager.signOutUser();
+                    exit = true;
                     break;
 
                 default:
                     System.out.println("Invalid choice. Please try again.");
                     break;
             }
+        }
     }
 
     private static void bookAppointment(Connection connection, int userId) {
-        
+        try {
             SQL_CON.showSalons(connection);
             int salon_id = AppointmentScheduler.chooseSalon();
             SQL_CON.showStylists(connection, salon_id);
@@ -201,15 +202,12 @@ public class HairhubApp {
             SQL_CON.showServices(connection);
             int service_id = AppointmentScheduler.chooseService(connection);
             LocalDate date = AppointmentScheduler.ChooseDate();
-            String datestr = date.toString();
-            TimeSlot result = AppointmentScheduler.ChooseTime(stylist_id, datestr, service_id);
-            LocalTime time_start = result.getStart();
-            LocalTime time_end = result.getEnd();
-            boolean successfulBooking = SQL_CON.INSTERT_Appointment(userId, salon_id, stylist_id, service_id, datestr, time_start.withSecond(0), connection);
-            AppointmentScheduler.isValidAppointment(successfulBooking, userId, stylist_id, salon_id, service_id, connection);
-            SQL_CON.insertAvailability(stylist_id, datestr, time_start.withSecond(0), time_end.withSecond(0), connection);
 
-           
+            AppointmentScheduler scheduler = new AppointmentScheduler();
+            scheduler.runScheduler(); 
+        } catch (SQLException e) {
+            System.out.println("Error initializing Appointment Scheduler: " + e.getMessage());
+        }
     }
 
     private static void showLatestAppointment(Connection connection, int userId) {
