@@ -49,29 +49,20 @@ public class CheckAvailability {
 
 
 
-    private LocalTime getServiceDuration(int serviceid) throws SQLException {
-    String serviceQuery = "SELECT duration FROM Services WHERE service_id = ?";
-    try (PreparedStatement serviceStmt = connection.prepareStatement(serviceQuery)) {
-        serviceStmt.setInt(1, serviceid);
-
-        ResultSet serviceResult = serviceStmt.executeQuery();
-        if (!serviceResult.next()) {
-            throw new SQLException("Service type not found");
+    private LocalTime getServiceDuration(String serviceType) throws SQLException {
+        String serviceQuery = "SELECT duration FROM Services WHERE service_type = ?";
+        try (PreparedStatement serviceStmt = connection.prepareStatement(serviceQuery)) {
+            serviceStmt.setString(1, serviceType);
+    
+            ResultSet serviceResult = serviceStmt.executeQuery();
+            if (!serviceResult.next()) {
+                throw new SQLException("Service type not found");
+            }
+    
+            return serviceResult.getTime("duration").toLocalTime();
         }
 
-        // Διασφαλίζουμε ότι το duration έχει πάντα τη μορφή HH:mm:ss
-        String durationString = serviceResult.getString("duration");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-
-        // Αν το duration είναι στην μορφή HH:mm (χωρίς δευτερόλεπτα), προσθέτουμε τα δευτερόλεπτα ως 00
-        if (durationString.length() == 5) {  // Αν η μορφή είναι HH:mm
-            durationString += ":00";  // Προσθήκη των δευτερολέπτων
-        }
-
-        return LocalTime.parse(durationString, formatter);  // Μετατροπή σε LocalTime με την σωστή μορφή
     }
-}
-
 
     
      
