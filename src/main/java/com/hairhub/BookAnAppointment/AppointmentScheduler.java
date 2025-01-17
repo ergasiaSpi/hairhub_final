@@ -16,7 +16,7 @@ public class AppointmentScheduler {
     private Connection connection;
     private static final String DATABASE_URL = "jdbc:sqlite:your-database-path.db"; // Update your database path
 
-    // Constructor to initialize the database connection
+    
     public AppointmentScheduler() throws SQLException {
         connection = DriverManager.getConnection(DATABASE_URL);
     }
