@@ -196,34 +196,30 @@ public class HairhubApp {
     }
 
     private static void bookAppointment(Connection connection, int userId) {
+        SQL_CON.showSalons(connection);
+        int salon_id = AppointmentScheduler.chooseSalon();
+        SQL_CON.showStylists(connection, salon_id);
+        int stylist_id = AppointmentScheduler.chooseStylist();
+        SQL_CON.showServices(connection);
+        int service_id = AppointmentScheduler.chooseService(connection);
+        LocalDate date = AppointmentScheduler.ChooseDate();
+        String datestr = date.toString();
+        TimeSlot result = AppointmentScheduler.ChooseTime(stylist_id, datestr, service_id);
+        LocalTime time_start = result.getStart();
+        LocalTime time_end = result.getEnd();
+        boolean successfulBooking = SQL_CON.INSTERT_Appointment(userId, salon_id, stylist_id, service_id, datestr, time_start.withSecond(0), connection);
+        AppointmentScheduler.isValidAppointment(successfulBooking, userId, stylist_id, salon_id, service_id, connection);
+        SQL_CON.insertAvailability(stylist_id, datestr, time_start.withSecond(0), time_end.withSecond(0), connection);
+        SQL_CON.removeAvailability(stylist_id, datestr, time_start.withSecond(0), time_end.withSecond(0), connection);
+        
         try {
-            SQL_CON.showSalons(connection);
-            int salon_id = AppointmentScheduler.chooseSalon();
-            SQL_CON.showStylists(connection, salon_id);
-            int stylist_id = AppointmentScheduler.chooseStylist();
-            SQL_CON.showServices(connection);
-            int service_id = AppointmentScheduler.chooseService(connection);
-            LocalDate date = AppointmentScheduler.ChooseDate();
-            String datestr = date.toString();
-            TimeSlot result = AppointmentScheduler.ChooseTime(stylist_id, datestr, service_id);
-            LocalTime time_start = result.getStart();
-            LocalTime time_end = result.getEnd();
-            boolean successfulBooking = SQL_CON.INSTERT_Appointment(userId, salon_id, stylist_id, service_id, datestr, time_start.withSecond(0), connection);
-            AppointmentScheduler.isValidAppointment(successfulBooking, userId, stylist_id, salon_id, service_id, connection);
-            SQL_CON.insertAvailability(stylist_id, datestr, time_start.withSecond(0), time_end.withSecond(0), connection);
-            SQL_CON.removeAvailability(stylist_id, datestr, time_start.withSecond(0), time_end.withSecond(0), connection);
-            
-            try {
-                TimeSlot timemanager = new TimeSlot(DB_URL);
-                timemanager.removeBookedTimeSlot(stylist_id, datestr, time_start.withSecond(0), time_end.withSecond(0), connection);
-                timemanager.close();
-            } catch (SQLException e) {
-                System.out.println("Database error during booking: " + e.getMessage());
-            }    
+            TimeSlot timemanager = new TimeSlot(DB_URL);
+            timemanager.removeBookedTimeSlot(stylist_id, datestr, time_start.withSecond(0), time_end.withSecond(0), connection);
+            timemanager.close();
         } catch (SQLException e) {
             System.out.println("Database error during booking: " + e.getMessage());
+        }
     }
-
 
 
            
@@ -236,27 +232,23 @@ public class HairhubApp {
                        "JOIN Services SR ON A.service_id = SR.service_id " +
                        "WHERE A.user_id = ? " +
                        "ORDER BY A.date DESC, A.time_start DESC LIMIT 1";
-    
+
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setInt(1, userId);
             ResultSet resultSet = pstmt.executeQuery();
-    
+
             if (resultSet.next()) {
-                
-                int appointmentId = resultSet.getInt("appointment_id");
-                LocalDate date = resultSet.getDate("date").toLocalDate();
-                LocalTime timeStart = resultSet.getTime("time_start").toLocalTime();
-                String salonName = resultSet.getString("salon_name");
-                String service = resultSet.getString("service");
-    
+                System.out.printf("Appointment ID: %d%n", resultSet.getInt("appointment_id"));
+                System.out.printf("Date: %s%n", resultSet.getString("date"));
+                System.out.printf("Time: %s%n", resultSet.getString("time_start"));
+                System.out.printf("Salon: %s%n", resultSet.getString("salon_name"));
+                System.out.printf("Service: %s%n", resultSet.getString("service"));
             } else {
                 System.out.println("No appointments found.");
             }
         } catch (SQLException e) {
             System.out.println("Error fetching latest appointment: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
-}
 }
