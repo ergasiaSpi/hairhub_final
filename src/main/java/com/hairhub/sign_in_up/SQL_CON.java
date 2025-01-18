@@ -243,8 +243,27 @@ public class SQL_CON {
         }
     }
 
+    public static void removeAvailability(int stylistId, String appointDate, LocalTime timeStart, LocalTime timeEnd, Connection connection) {
+        String deleteQuery = "DELETE FROM AvailabilitybyStylist " +
+                             "WHERE stylist_id = ? AND appoint_date = ? AND time_start = ? AND time_end = ?";
 
+        try (PreparedStatement deleteStmt = connection.prepareStatement(deleteQuery)) {
 
+            deleteStmt.setInt(1, stylistId);
+            deleteStmt.setString(2, appointDate);
+            deleteStmt.setTime(3, Time.valueOf(timeStart));
+            deleteStmt.setTime(4, Time.valueOf(timeEnd));
+
+            int rowsAffected = deleteStmt.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Availability removed successfully for the booked slot.");
+            } else {
+                System.out.println("No availability was found for the specified details.");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error removing availability: " + e.getMessage());
+        }
+    }
 
     public static void viewAppointmentsByAdmin(int adminId) {
         String query = """

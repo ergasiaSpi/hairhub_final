@@ -208,9 +208,21 @@ public class HairhubApp {
             boolean successfulBooking = SQL_CON.INSTERT_Appointment(userId, salon_id, stylist_id, service_id, datestr, time_start.withSecond(0), connection);
             AppointmentScheduler.isValidAppointment(successfulBooking, userId, stylist_id, salon_id, service_id, connection);
             SQL_CON.insertAvailability(stylist_id, datestr, time_start.withSecond(0), time_end.withSecond(0), connection);
-
+            SQL_CON.removeAvailability(stylist_id, datestr, time_start.withSecond(0), time_end.withSecond(0), connection);
+            
+            try {
+                TimeSlot timemanager = new TimeSlot(DB_URL);
+                timemanager.removeBookedTimeSlot(stylist_id, datestr, time_start.withSecond(0), time_end.withSecond(0), connection);
+                timemanager.close();
+            } catch (SQLException e) {
+                System.out.println("Database error during booking: " + e.getMessage());
+            }    
            
     }
+
+
+           
+    
 
     private static void showLatestAppointment(Connection connection, int userId) {
         String query = "SELECT A.appointment_id, A.date, A.time_start, S.name AS salon_name, SR.service " +

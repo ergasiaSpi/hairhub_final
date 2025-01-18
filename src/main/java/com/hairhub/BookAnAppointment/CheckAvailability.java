@@ -151,8 +151,6 @@ public class CheckAvailability {
         backtrack(currentTime.plusMinutes(serviceDuration), shiftEnd, serviceDuration, bookedSlots, currentCombination, optimalSlots);
     }
 
-    
-
     public void close() throws SQLException {
         if (connection != null) {
             connection.close();
