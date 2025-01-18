@@ -218,9 +218,10 @@ public class HairhubApp {
             } catch (SQLException e) {
                 System.out.println("Database error during booking: " + e.getMessage());
             }    
-           
+        } catch (SQLException e) {
+            System.out.println("Database error during booking: " + e.getMessage());
     }
-}
+
 
 
            
