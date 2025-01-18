@@ -1,8 +1,10 @@
 package com.hairhub.HairhubApp;
 
 import com.hairhub.sign_in_up.UserSessionManager;
+import com.hairhub.Admin.*;
 import com.hairhub.sign_in_up.SQL_CON;
 import com.hairhub.sign_in_up.UserInput;
+import com.hairhub.Admin.Admin_insert;
 import com.hairhub.BookAnAppointment.AppointmentScheduler;
 import java.time.LocalDate;
 
@@ -53,15 +55,16 @@ public class HairhubApp {
         }
     }
 
-    private static void signInProcess(Connection connection, Scanner scanner) {
+    private static void signInProcess(Connection connection, Scanner scanner) throws SQLException{
+        
         System.out.println("Please log in.");
-        String username = UserInput.Get_Username();
+        String username = UserInput.Get_Username(true);
         String password = UserInput.Get_Password();
         SQL_CON.SQL_SELECT(username, password);
-
         int userId = authenticateUser(connection, username, password);
         if (userId != -1) {
             UserSessionManager.signInUser(userId);
+
             String userRole = UserSessionManager.getSignedInUserRole();
 
             System.out.printf("Hello, %s! You are logged in as a %s.%n", username, userRole);
@@ -71,10 +74,10 @@ public class HairhubApp {
         }
     }
 
-    private static void signUpProcess(Connection connection, Scanner scanner) {
+    private static void signUpProcess(Connection connection, Scanner scanner) throws SQLException{
         // Assuming you will add the logic for sign up
         System.out.println("Please sign up.");
-        String username = UserInput.Get_Username();
+        String username = UserInput.Get_Username(true);
         String password = UserInput.Get_Password();
         String phone = UserInput.Get_Phone();
         String email = UserInput.Get_Email();
@@ -89,7 +92,7 @@ public class HairhubApp {
         signInProcess(connection, scanner);
     }
 
-    private static int authenticateUser(Connection connection, String username, String password) {
+    public static int authenticateUser(Connection connection, String username, String password) {
         String query = "SELECT user_id, role FROM Users WHERE username = ? AND user_password = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, username);
@@ -107,9 +110,9 @@ public class HairhubApp {
         return -1; 
     }
 
-    private static void showRoleBasedMenu(Scanner scanner, Connection connection, int userId, String userRole) {
+    private static void showRoleBasedMenu(Scanner scanner, Connection connection, int userId, String userRole) throws SQLException {
         boolean exit = false;
-        while (!exit) {
+        
             if (userRole.equals("admin")) {
                 showAdminMenu(scanner, connection, userId);
             } else if (userRole.equals("customer")) {
@@ -118,16 +121,20 @@ public class HairhubApp {
 
             
         }
-    }
+    
 
-    private static void showAdminMenu(Scanner scanner, Connection connection, int userId) {
+    private static void showAdminMenu(Scanner scanner, Connection connection, int userId) throws SQLException {
         boolean exit = false;
         while (!exit) {
             System.out.println("\nAdmin Menu:");
             System.out.println("1. View all users");
             System.out.println("2. View all appointments");
-            System.out.println("3. Manage salons");
-            System.out.println("4. Sign Out");
+            System.out.println("3. Add salon");
+            System.out.println("4. Add stylist");
+            System.out.println("5. Add service");
+            System.out.println("6. Delete salon");
+            System.out.println("7. Delete stylist");
+            System.out.println("8. Sign Out");
             System.out.print("Enter your choice: ");
             int choice = scanner.nextInt();
 
@@ -143,13 +150,34 @@ public class HairhubApp {
                     break;
 
                 case 3:
-                    System.out.println("Redirecting to manage salons...");
+                    Admin_Show.showSalons(connection);
+                    Admin_insert.insertIntoSalons(connection, scanner);
                     break;
 
                 case 4:
+                    Admin_Show.showStylists(connection);
+                    Admin_insert.insertIntoStylists(connection, scanner);
+                    break;
+
+                case 5:
+                    Admin_Show.showServices(connection);
+                    Admin_insert.insertIntoServices(connection, scanner);
+                    break;
+
+                case 6:
+                    Admin_Show.showSalons(connection);
+                    Admin_delete.deleteSalon(connection, scanner);
+                    break;
+
+                case 7:
+                    Admin_Show.showStylists(connection);
+                    Admin_delete.deleteFromStylists(connection, scanner);
+                    break;
+
+                case 8:
                     System.out.println("Signing out...");
-                    UserSessionManager.signOutUser();
                     exit = true;
+                    UserSessionManager.signOutUser();
                     break;
 
                 default:

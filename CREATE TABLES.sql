@@ -1,6 +1,14 @@
 -- Ενεργοποίηση Foreign Key Constraints
 PRAGMA foreign_keys = ON;
 
+-- Δημιουργία πίνακα Location
+CREATE TABLE Location (
+    zipcode TEXT PRIMARY KEY,
+    territory TEXT NOT NULL,
+    longitude REAL NOT NULL,
+    latitude REAL NOT NULL
+);
+
 -- Δημιουργία πίνακα Users
 CREATE TABLE Users (
     user_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -24,13 +32,7 @@ CREATE TABLE Salons (
     FOREIGN KEY (zipcode) REFERENCES Location(zipcode) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE Location (
-    zipcode TEXT PRIMARY KEY,
-    territory TEXT NOT NULL,
-    longtitude REAL NOT NULL,
-    latitude REAL NOT NULL
-);
-
+-- Δημιουργία πίνακα Stylists
 CREATE TABLE Stylists (
     stylist_id INTEGER PRIMARY KEY AUTOINCREMENT,
     stylist_name TEXT NOT NULL,
@@ -44,10 +46,12 @@ CREATE TABLE Stylists (
 -- Δημιουργία πίνακα Services
 CREATE TABLE Services (
     service_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    stylist_id INTEGER NOT NULL,
     service TEXT NOT NULL,
-    service_type TEXT,
+    service_type TEXT NOT NULL,
     price REAL NOT NULL,
-    duration TIME NOT NULL
+    duration TIME NOT NULL,
+    FOREIGN KEY (stylist_id) REFERENCES Stylists(stylist_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- Δημιουργία πίνακα AvailabilitybyStylist
@@ -76,14 +80,3 @@ CREATE TABLE Appointments (
     FOREIGN KEY (stylist_id) REFERENCES Stylists(stylist_id) ON DELETE SET NULL,
     FOREIGN KEY (service_id) REFERENCES Services(service_id) ON DELETE CASCADE
 );
-
--- Δημιουργία πίνακα Location
-CREATE TABLE Location (
-    zipcode TEXT PRIMARY KEY,
-    territory TEXT NOT NULL,
-    longtitude REAL NOT NULL,
-    latitude REAL NOT NULL
-);
-
-
-

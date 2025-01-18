@@ -6,13 +6,17 @@ public class UserInput {
 
     private static Scanner input = new Scanner(System.in);
 
-    public static String Get_Username() {
+    public static String Get_Username(boolean UserOrAdmin) {
         String Username = " ";
         boolean valid = false;
         do {
-            System.out.println("Username: ");
+            if (UserOrAdmin) {
+                System.out.println("Username: ");
+            } else {
+                System.out.println("Salon name: ");
+            }
             Username = input.nextLine();
-            valid = Constrictions.Username_Constrictions(Username);
+            valid = Constrictions.Name_Constrictions(Username);
             if (!valid) {
                 System.out.println("Invalid username. Please try again.");
             }

@@ -7,19 +7,19 @@ public class Constrictions {
 
     
     // Ελέγχει το Username
-    public static boolean Username_Constrictions(String Username) {
+    public static boolean Name_Constrictions(String Username) {
         if (Username.length() < 5 || Username.length() > 20) {
-            System.out.println("The username must be between 5 and 20 characters.");
+            System.out.println("The input must be between 5 and 20 characters.");
             return false;
         }
         
         if (!Username.matches(".*[a-zA-Z].*")) {
-            System.out.println("The username must contain at least one letter.");
+            System.out.println("The input must contain at least one letter.");
             return false;
         }
         
         if (Username.contains(" ")) {
-            System.out.println("The username must not contain spaces.");
+            System.out.println("The input must not contain spaces.");
             return false;
         }
         
@@ -102,6 +102,12 @@ public class Constrictions {
             System.out.println("Invalid role. It must be either 'Customer' or 'Admin'.");
             return false;
         }
+    }
+
+    public static boolean isValidTime(String time) {
+        // Regular Expression for HH:MM:SS
+        String timeRegex = "([01]\\d|2[0-3]):([0-5]\\d):([0-5]\\d)";
+        return time.matches(timeRegex);
     }
 
    
