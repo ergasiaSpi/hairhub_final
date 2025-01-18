@@ -13,14 +13,13 @@ import com.hairhub.sign_in_up.UserSessionManager;
 public class AppointmentScheduler {
 
     private Connection connection;
-    private static final String DATABASE_URL = "jdbc:sqlite:your-database-path.db"; // Update your database path
-
+    private static final String DATABASE_URL = "jdbc:sqlite:your-database-path.db"; 
     
     public AppointmentScheduler() throws SQLException {
         connection = DriverManager.getConnection(DATABASE_URL);
     }
 
-    // Method to book an appointment
+    
       public boolean bookAppointment(int userId, int salonId, int stylistId, int serviceId, 
                                    LocalDate date, LocalTime timeStart, LocalTime timeEnd) {
         String query = "INSERT INTO Appointments (appointment_id, user_id, salon_id, stylist_id, service_id, date, time_start, time_end) " +
@@ -41,7 +40,7 @@ public class AppointmentScheduler {
         }
     }
 
-    // Method to get stylists by salon ID
+   
     private List<String> getStylistsBySalonId(int salonId) throws SQLException {
         List<String> stylistNames = new ArrayList<>();
         String query = "SELECT stylist_name FROM Stylists WHERE salon_id = ?";
@@ -118,49 +117,48 @@ public class AppointmentScheduler {
         int salonId = -1;
         boolean validSalonId = false;
 
-        // Σύνδεση με τη βάση δεδομένων
+       
         try (Connection connection = DriverManager.getConnection("jdbc:sqlite:hairhub.db")) {
 
-            // Επαναλαμβάνουμε την εισαγωγή μέχρι να είναι έγκυρο το salonId
             while (!validSalonId) {
                 System.out.print("Please enter a salon ID: ");
                 String input = scanner.nextLine();
                 
                 try {
-                    // Προσπαθούμε να μετατρέψουμε την είσοδο σε ακέραιο
+                
                     salonId = Integer.parseInt(input);
                     
-                    // Ελέγχουμε αν το salon_id υπάρχει στον πίνακα Salons
+                   
                     if (isValidSalonId(connection, salonId)) {
-                        validSalonId = true;  // Αν είναι έγκυρο, βγαίνουμε από τον βρόχο
+                        validSalonId = true; 
                     } else {
                         System.out.println("Invalid salon ID! No salon found with ID " + salonId);
                     }
                     
                 } catch (NumberFormatException e) {
-                    // Αν η είσοδος δεν είναι έγκυρη αριθμητικά
+                   
                     System.out.println("Invalid input! Please enter a valid integer.");
                 }
             }
 
-        // Αν το ID είναι έγκυρο, επιστρέφουμε το ID του salon
+       
         return salonId;
 
     } catch (SQLException e) {
         System.out.println("Database error: " + e.getMessage());
-        return -1;  // Επιστρέφει -1 σε περίπτωση σφάλματος στη βάση δεδομένων
+        return -1;  
     }
     } 
     
-        // Μέθοδος για να ελέγξουμε αν το salon_id υπάρχει στον πίνακα Salons
+        
     public static boolean isValidSalonId(Connection connection, int salonId) {
-        String query = "SELECT COUNT(*) FROM Salons WHERE salon_id = ?";  // SQL query για να μετρήσουμε τις εγγραφές
+        String query = "SELECT COUNT(*) FROM Salons WHERE salon_id = ?";  
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, salonId);  // Ορίζουμε το πραγματικό salon_id που εισήγαγε ο χρήστης
-            ResultSet resultSet = stmt.executeQuery();  // Εκτελούμε το query
+            stmt.setInt(1, salonId);  
+            ResultSet resultSet = stmt.executeQuery();  
 
-            // Αν το COUNT(*) είναι μεγαλύτερο από 0, τότε υπάρχει salon με αυτό το ID
+           
             return resultSet.getInt(1) > 0;
 
         } catch (SQLException e) {
@@ -176,41 +174,41 @@ public class AppointmentScheduler {
         int stylistId = -1;
         boolean validStylistId = false;
 
-        // Σύνδεση με τη βάση δεδομένων
+       
         try (Connection connection = DriverManager.getConnection("jdbc:sqlite:hairhub.db")) {
 
-            // Επαναλαμβάνουμε την εισαγωγή μέχρι να είναι έγκυρο το stylistId
+           
             while (!validStylistId) {
                 System.out.print("Please enter a stylist ID: ");
                 String input = scanner.nextLine();
                 
                 try {
-                    // Προσπαθούμε να μετατρέψουμε την είσοδο σε ακέραιο
+                 
                     stylistId = Integer.parseInt(input);
                     
-                    // Ελέγχουμε αν το stylist_id υπάρχει στον πίνακα Stylists
+                    
                     if (isValidStylistId(connection, stylistId)) {
-                        validStylistId = true;  // Αν είναι έγκυρο, βγαίνουμε από τον βρόχο
+                        validStylistId = true;  
                     } else {
                         System.out.println("Invalid stylist ID! No stylist found with ID " + stylistId);
                     }
                     
                 } catch (NumberFormatException e) {
-                    // Αν η είσοδος δεν είναι έγκυρη αριθμητικά
+                   
                     System.out.println("Invalid input! Please enter a valid integer.");
                 }
             }
 
-            // Αν το ID είναι έγκυρο, επιστρέφουμε το ID του stylist
+          
             return stylistId;
 
         } catch (SQLException e) {
             System.out.println("Database error: " + e.getMessage());
-            return -1;  // Επιστρέφει -1 σε περίπτωση σφάλματος στη βάση δεδομένων
+            return -1;  
         }
     }
 
-    // Μέθοδος για να ελέγξουμε αν το stylist_id υπάρχει στον πίνακα Stylists
+  
     public static boolean isValidStylistId(Connection connection, int stylistId) {
         String query = "SELECT COUNT(*) FROM Stylists WHERE stylist_id = ?";
         
@@ -218,7 +216,7 @@ public class AppointmentScheduler {
             stmt.setInt(1, stylistId);
             ResultSet resultSet = stmt.executeQuery();
 
-            // Αν το COUNT(*) είναι μεγαλύτερο από 0, τότε υπάρχει stylist με αυτό το ID
+            
             return resultSet.getInt(1) > 0;
 
         } catch (SQLException e) {
@@ -236,28 +234,27 @@ public class AppointmentScheduler {
             if (scanner.hasNextInt()) {
                 chosenServiceId = scanner.nextInt();
 
-                // Ελέγχουμε αν η υπηρεσία με το επιλεγμένο ID υπάρχει
+              
                 if (serviceExists(connection, chosenServiceId)) {
                     System.out.println("Service " + chosenServiceId + " chosen successfully.");
                 } else {
                     System.out.println("Invalid Service ID. Please try again.");
-                    chosenServiceId = -1;  // Επαναφορά για νέα επιλογή
+                    chosenServiceId = -1;  
                 }
             } else {
                 System.out.println("Invalid input. Please enter a valid integer Service ID.");
-                scanner.next();  // Καθαρίζουμε την είσοδο του scanner
+                scanner.next();  
             }
         }
-        return chosenServiceId;  // Επιστρέφουμε το ID της επιλεγμένης υπηρεσίας
+        return chosenServiceId; 
     }
 
-    // Μέθοδος για να ελέγξουμε αν η υπηρεσία υπάρχει στη βάση δεδομένων
     private static boolean serviceExists(Connection connection, int serviceId) {
         String query = "SELECT COUNT(*) FROM Services WHERE service_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, serviceId);
             ResultSet resultSet = stmt.executeQuery();
-            return resultSet.getInt(1) > 0;  // Επιστρέφουμε true αν υπάρχει τουλάχιστον μια υπηρεσία με αυτό το ID
+            return resultSet.getInt(1) > 0; 
         } catch (SQLException e) {
             System.out.println("Error checking service existence: " + e.getMessage());
             return false;
@@ -269,22 +266,22 @@ public class AppointmentScheduler {
         LocalDate validDate = null;
         boolean valid = false;
 
-        // Ημερομηνία περιοχής από την τρέχουσα ημερομηνία μέχρι 24/7/2025
-        LocalDate startDate = LocalDate.now();  // Η τρέχουσα ημερομηνία
+     
+        LocalDate startDate = LocalDate.now(); 
         LocalDate endDate = LocalDate.of(2025, 7, 24);
 
         while (!valid) {
             System.out.print("Please enter a date (dd/MM/yyyy): ");
             String inputDate = scanner.nextLine();
             
-            // Προσπαθούμε να κάνουμε parse την ημερομηνία
+         
             try {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
                 validDate = LocalDate.parse(inputDate, formatter);
                 
-                // Ελέγχουμε αν η ημερομηνία είναι εντός του επιτρεπόμενου εύρους
+              
                 if (!validDate.isBefore(startDate) && !validDate.isAfter(endDate)) {
-                    valid = true;  // Η ημερομηνία είναι έγκυρη
+                    valid = true; 
                 } else {
                     System.out.println("The date must be between today (" + startDate + ") and 24/07/2025. Please try again.");
                 }
@@ -303,23 +300,23 @@ public class AppointmentScheduler {
             CheckAvailability checkAvailability = new CheckAvailability(DATABASE_URL);
             List<String> availableTimeSlots = checkAvailability.FindTime(stylist_id, appoint_date, serviceid);
             
-            // Αν δεν υπάρχουν διαθέσιμες ώρες
+          
             if (availableTimeSlots.isEmpty()) {
                 System.out.println("No available time slots for the selected stylist, date, and service.");
-                return null;  // Επιστροφή null αν δεν υπάρχουν διαθέσιμες ώρες
+                return null; 
             }
     
-            // Εμφάνιση διαθέσιμων ωρών
+          
             System.out.println("Available time slots:");
             for (int i = 0; i < availableTimeSlots.size(); i++) {
                 System.out.println((i + 1) + ". " + availableTimeSlots.get(i));
             }
     
-            // Επιλογή ώρας από τον χρήστη
+        
             System.out.println("Choose a time slot by number:");
             int timeSlotChoice = -1;
             
-            // Έλεγχος εγκυρότητας εισόδου για την επιλογή του χρήστη
+           
             while (timeSlotChoice < 1 || timeSlotChoice > availableTimeSlots.size()) {
                 if (scanner.hasNextInt()) {
                     timeSlotChoice = scanner.nextInt();
@@ -328,11 +325,10 @@ public class AppointmentScheduler {
                     }
                 } else {
                     System.out.println("Invalid input. Please enter a number.");
-                    scanner.next(); // Καθαρίζει την μη έγκυρη είσοδο
+                    scanner.next(); 
                 }
             }
     
-            // Ανάλυση του επιλεγμένου χρόνου
             String TimeStartstr = availableTimeSlots.get(timeSlotChoice - 1);
             LocalTime TimeStart = LocalTime.parse(TimeStartstr);
             String TimeEndstr = availableTimeSlots.get(timeSlotChoice);
@@ -346,17 +342,17 @@ public class AppointmentScheduler {
            
     
         } catch (SQLException e) {
-            // Χειρισμός εξαιρέσεων που σχετίζονται με την βάση δεδομένων
+           
             System.out.println("Database error: " + e.getMessage());
         } catch (DateTimeParseException e) {
-            // Χειρισμός εξαιρέσεων κατά την ανάλυση ημερομηνίας/ώρας
+          
             System.out.println("Invalid time format: " + e.getMessage());
         } catch (Exception e) {
-            // Γενικός χειρισμός για άλλες εξαιρέσεις
+           
             System.out.println("An error occurred: " + e.getMessage());
         }
     
-        return null; // Επιστροφή null σε περίπτωση σφάλματος
+        return null; 
     }
     
     public static void isValidAppointment(boolean successfulBooking, int user_id, int stylist_id, int salon_id, int service_id, Connection connection) {
@@ -370,16 +366,16 @@ public class AppointmentScheduler {
     
         if (successfulBooking) {
             try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                // Βάζουμε την παράμετρο user_id πριν την εκτέλεση του query
+               
                 stmt.setInt(1, user_id);
                 stmt.setInt(2, salon_id);
                 stmt.setInt(3, stylist_id);
                 stmt.setInt(4, service_id);
     
                 try (ResultSet resultSet = stmt.executeQuery()) {
-                    // Ελέγχουμε αν υπάρχει εγγραφή στο ResultSet
+                   
                     if (resultSet.next()) {
-                        // Εμφάνιση λεπτομερειών ραντεβού
+                        
                         System.out.println("\nAppointment details:");                   
                         System.out.printf("Date: %s%n", resultSet.getString("date"));
                         System.out.printf("Time: %s%n", resultSet.getString("time_start"));
@@ -399,33 +395,31 @@ public class AppointmentScheduler {
     }
     
     public static LocalTime Get_ServiceDuration (Connection connection, int service_id) throws SQLException {
-        // SQL query για να πάρουμε το service_type από τον πίνακα Services
+        
         String query = "SELECT duration FROM Services WHERE service_id = ?";
         
-        // Προετοιμασία της δήλωσης για το query
+    
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-            // Ορισμός του service_id στο prepared statement
+           
             pstmt.setInt(1, service_id);
     
-            // Εκτέλεση του query και λήψη των αποτελεσμάτων
             ResultSet rs = pstmt.executeQuery();
     
-            // Αν το αποτέλεσμα δεν είναι κενό (δηλαδή βρέθηκε το service_id στη βάση)
             if (rs.next()) {
                 return rs.getTime("duration").toLocalTime();
             } else {
-                // Αν δεν βρεθεί το service_id στη βάση, ρίχνουμε εξαίρεση
+                
                 throw new SQLException("Service duration not found with the given ID");
             }
         }
     }
     public static LocalTime parseTimeWithSeconds(String timeString) {
-        // Έλεγχος αν το String είναι στη μορφή HH:mm (χωρίς δευτερόλεπτα)
-        if (timeString.length() == 5) { // Μορφή HH:mm
-            timeString += ":00"; // Προσθήκη των δευτερολέπτων
+       
+        if (timeString.length() == 5) { 
+            timeString += ":00"; 
         }
         
-        // Χρησιμοποίηση του LocalTime.parse με το σωστό formatter
+    
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         return LocalTime.parse(timeString, formatter);
     }
@@ -436,6 +430,6 @@ public class AppointmentScheduler {
 
 
 
-    // Method to run the appointment scheduler
+    
 }
         
