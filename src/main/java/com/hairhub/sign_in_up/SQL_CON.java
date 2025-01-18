@@ -1,11 +1,9 @@
 package com.hairhub.sign_in_up;
 
 import java.sql.*;
-import java.time.LocalDate;
-import java.time.LocalTime;
 
 public class SQL_CON {
-  
+
     public static void SQL_INSERT(String Username, String Password, String email, String phone, String postal_code, String role) {
         
         String Query = "INSERT INTO Users (username, user_password, email, phone, postal_code, role) VALUES (?, ?, ?, ?, ?, ?)";
@@ -142,11 +140,8 @@ public class SQL_CON {
                 int stylistId = resultSet.getInt("stylist_id");
                 String stylistName = resultSet.getString("stylist_name");
                 String specializations = resultSet.getString("specializations");
-                String shiftStartStr = resultSet.getString("shift_start");
-                LocalTime shiftStart = LocalTime.parse(shiftStartStr);
-                String shiftEndStr = resultSet.getString("shift_end");
-                LocalTime shiftEnd = LocalTime.parse(shiftEndStr);
-
+                Time shiftStart = resultSet.getTime("shift_start");
+                Time shiftEnd = resultSet.getTime("shift_end");
 
                 // Εμφανίζουμε τις πληροφορίες του κάθε stylist
                 System.out.println("Stylist ID: " + stylistId);
@@ -182,8 +177,7 @@ public class SQL_CON {
                 int serviceId = resultSet.getInt("service_id");
                 String serviceName = resultSet.getString("service");
                 double price = resultSet.getDouble("price");
-                String durationstr = resultSet.getString("duration");
-                LocalTime duration = LocalTime.parse(durationstr);
+                Time duration = resultSet.getTime("duration");
 
                 // Εμφανίζουμε τις πληροφορίες για κάθε υπηρεσία
                 System.out.println("Service ID: " + serviceId);

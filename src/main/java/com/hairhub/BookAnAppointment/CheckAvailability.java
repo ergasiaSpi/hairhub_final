@@ -1,7 +1,6 @@
 package com.hairhub.BookAnAppointment;
 import java.sql.*;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,15 +14,15 @@ public class CheckAvailability {
 
   
 
-    public List<String> FindTime(int stylistid, String appointmentDate, int serviceid) throws SQLException {
+    public List<String> FindTime(String stylistName, String appointmentDate, String serviceType) throws SQLException {
         
-        List<TimeSlot> bookedSlots = getBookedTimeSlots(stylistid, appointmentDate);
+        List<TimeSlot> bookedSlots = getBookedTimeSlots(stylistName, appointmentDate);
 
       
-        TimeSlot stylistShift = getStylistShift(stylistid);
+        TimeSlot stylistShift = getStylistShift(stylistName);
 
     
-        LocalTime serviceDuration = getServiceDuration(serviceid);
+        LocalTime serviceDuration = getServiceDuration(serviceType);
 
       
         List<String> optimalSlots = calculateOptimalSlots(stylistShift, bookedSlots, serviceDuration);
@@ -32,10 +31,10 @@ public class CheckAvailability {
     }
 
 
-    private TimeSlot getStylistShift(int stylistid) throws SQLException {
-        String shiftQuery = "SELECT shift_start, shift_end FROM Stylists WHERE stylist_id = ?";
+    private TimeSlot getStylistShift(String stylistName) throws SQLException {
+        String shiftQuery = "SELECT shift_start, shift_end FROM Stylists WHERE stylist_name = ?";
         PreparedStatement shiftStmt = connection.prepareStatement(shiftQuery);
-        shiftStmt.setInt(1, stylistid);
+        shiftStmt.setString(1, stylistName);
 
         ResultSet shiftResult = shiftStmt.executeQuery();
         if (!shiftResult.next()) {
@@ -50,38 +49,29 @@ public class CheckAvailability {
 
 
 
-    private LocalTime getServiceDuration(int serviceid) throws SQLException {
-    String serviceQuery = "SELECT duration FROM Services WHERE service_id = ?";
-    try (PreparedStatement serviceStmt = connection.prepareStatement(serviceQuery)) {
-        serviceStmt.setInt(1, serviceid);
-
-        ResultSet serviceResult = serviceStmt.executeQuery();
-        if (!serviceResult.next()) {
-            throw new SQLException("Service type not found");
+    private LocalTime getServiceDuration(String serviceType) throws SQLException {
+        String serviceQuery = "SELECT duration FROM Services WHERE service_type = ?";
+        try (PreparedStatement serviceStmt = connection.prepareStatement(serviceQuery)) {
+            serviceStmt.setString(1, serviceType);
+    
+            ResultSet serviceResult = serviceStmt.executeQuery();
+            if (!serviceResult.next()) {
+                throw new SQLException("Service type not found");
+            }
+    
+            return serviceResult.getTime("duration").toLocalTime();
         }
 
-        // Διασφαλίζουμε ότι το duration έχει πάντα τη μορφή HH:mm:ss
-        String durationString = serviceResult.getString("duration");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-
-        // Αν το duration είναι στην μορφή HH:mm (χωρίς δευτερόλεπτα), προσθέτουμε τα δευτερόλεπτα ως 00
-        if (durationString.length() == 5) {  // Αν η μορφή είναι HH:mm
-            durationString += ":00";  // Προσθήκη των δευτερολέπτων
-        }
-
-        return LocalTime.parse(durationString, formatter);  // Μετατροπή σε LocalTime με την σωστή μορφή
     }
-}
-
 
     
      
-    private List<TimeSlot> getBookedTimeSlots(int stylistid, String appointmentDate) throws SQLException {
+    private List<TimeSlot> getBookedTimeSlots(String stylistName, String appointmentDate) throws SQLException {
         String appointmentsQuery = "SELECT time_start, time_end FROM AvailabilitybyStylist " +
-                                   "WHERE stylist_id = ? " +
+                                   "WHERE stylist_id = (SELECT stylist_id FROM Stylists WHERE stylist_name = ?) " +
                                    "AND appoint_date = ?";
         PreparedStatement appointmentsStmt = connection.prepareStatement(appointmentsQuery);
-        appointmentsStmt.setInt(1, stylistid);
+        appointmentsStmt.setString(1, stylistName);
         appointmentsStmt.setString(2, appointmentDate);
 
         ResultSet appointmentsResult = appointmentsStmt.executeQuery();
@@ -95,7 +85,6 @@ public class CheckAvailability {
 
         return bookedSlots;
     }
-    
 
   
      
@@ -149,12 +138,33 @@ public class CheckAvailability {
 
       
         backtrack(currentTime.plusMinutes(serviceDuration), shiftEnd, serviceDuration, bookedSlots, currentCombination, optimalSlots);
-    }
+    }  
 
     public void close() throws SQLException {
         if (connection != null) {
             connection.close();
         }
     }
+
+    private static class TimeSlot {
+        private LocalTime start;
+        private LocalTime end;
+
+        public TimeSlot(LocalTime start, LocalTime end) {
+            this.start = start;
+            this.end = end;
+        }
+
+        public LocalTime getStart() {
+            return start;
+        }
+    
+        public LocalTime getEnd() {
+            return end;
+        }
+
+        public boolean overlaps(TimeSlot other) {
+            return !(end.isBefore(other.start) || start.isAfter(other.end));
+        }
+    }
 }
-   
