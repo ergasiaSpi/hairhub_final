@@ -18,19 +18,11 @@ CREATE TABLE Salons (
     admin_id INTEGER NOT NULL,
     name TEXT NOT NULL,
     address TEXT NOT NULL,
-    postal_code TEXT NOT NULL,
+    zipcode TEXT NOT NULL,
     phone_number TEXT NOT NULL,
     email TEXT,
     FOREIGN KEY (zipcode) REFERENCES Location(zipcode) ON DELETE CASCADE ON UPDATE CASCADE
 );
-
-CREATE TABLE Location (
-    zipcode TEXT PRIMARY KEY,
-    territory TEXT NOT NULL,
-    longtitude REAL NOT NULL,
-    latitude REAL NOT NULL
-);
-
 CREATE TABLE Stylists (
     stylist_id INTEGER PRIMARY KEY AUTOINCREMENT,
     stylist_name TEXT NOT NULL,
@@ -54,7 +46,7 @@ CREATE TABLE Services (
 CREATE TABLE AvailabilitybyStylist (
     availability_id INTEGER PRIMARY KEY AUTOINCREMENT,
     stylist_id INTEGER NOT NULL,
-    appoint_date DATE NOT NULL,
+    appoint_date TEXT NOT NULL,
     time_start TIME NOT NULL,
     time_end TIME NOT NULL,
     FOREIGN KEY (stylist_id) REFERENCES Stylists(stylist_id) ON DELETE CASCADE,
@@ -68,9 +60,8 @@ CREATE TABLE Appointments (
     salon_id INTEGER NOT NULL,
     stylist_id INTEGER,
     service_id INTEGER NOT NULL,
-    date DATE NOT NULL,
+    date TEXT NOT NULL,
     time_start TIME NOT NULL,
-    status TEXT NOT NULL CHECK (status IN ('pending', 'confirmed', 'canceled')) DEFAULT 'pending',
     FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (salon_id) REFERENCES Salons(salon_id) ON DELETE CASCADE,
     FOREIGN KEY (stylist_id) REFERENCES Stylists(stylist_id) ON DELETE SET NULL,
@@ -84,6 +75,5 @@ CREATE TABLE Location (
     longtitude REAL NOT NULL,
     latitude REAL NOT NULL
 );
-
 
 

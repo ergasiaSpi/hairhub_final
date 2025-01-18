@@ -74,7 +74,7 @@ public class HairhubApp {
     }
 
     private static void signUpProcess(Connection connection, Scanner scanner) {
-        // Assuming you will add the logic for sign up
+        
         System.out.println("Please sign up.");
         String username = UserInput.Get_Username();
         String password = UserInput.Get_Password();
@@ -84,9 +84,7 @@ public class HairhubApp {
         String role = UserInput.Get_Role();
         SQL_CON.SQL_INSERT(username, password, email, phone, zip_code, role);
 
-        // Add sign-up logic here, such as inserting new user into the database
-        // If successful, then proceed to sign-in process after sign-up
-
+        
         System.out.println("Sign up successful. Please Sign in. ");
         signInProcess(connection, scanner);
     }
