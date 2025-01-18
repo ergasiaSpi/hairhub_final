@@ -6,8 +6,10 @@ import com.hairhub.sign_in_up.SQL_CON;
 import com.hairhub.sign_in_up.UserInput;
 import com.hairhub.Admin.Admin_insert;
 import com.hairhub.BookAnAppointment.AppointmentScheduler;
-import java.time.LocalDate;
+import com.hairhub.BookAnAppointment.TimeSlot;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.sql.*;
 import java.util.Scanner;
 
@@ -74,8 +76,13 @@ public class HairhubApp {
         }
     }
 
+<<<<<<< HEAD
     private static void signUpProcess(Connection connection, Scanner scanner) throws SQLException{
         // Assuming you will add the logic for sign up
+=======
+    private static void signUpProcess(Connection connection, Scanner scanner) {
+        
+>>>>>>> d71e3145a1d7915c6f0edf40d00aa03b2720f664
         System.out.println("Please sign up.");
         String username = UserInput.Get_Username(true);
         String password = UserInput.Get_Password();
@@ -85,9 +92,7 @@ public class HairhubApp {
         String role = UserInput.Get_Role();
         SQL_CON.SQL_INSERT(username, password, email, phone, zip_code, role);
 
-        // Add sign-up logic here, such as inserting new user into the database
-        // If successful, then proceed to sign-in process after sign-up
-
+        
         System.out.println("Sign up successful. Please Sign in. ");
         signInProcess(connection, scanner);
     }
@@ -222,21 +227,34 @@ public class HairhubApp {
     }
 
     private static void bookAppointment(Connection connection, int userId) {
+        SQL_CON.showSalons(connection);
+        int salon_id = AppointmentScheduler.chooseSalon();
+        SQL_CON.showStylists(connection, salon_id);
+        int stylist_id = AppointmentScheduler.chooseStylist();
+        SQL_CON.showServices(connection);
+        int service_id = AppointmentScheduler.chooseService(connection);
+        LocalDate date = AppointmentScheduler.ChooseDate();
+        String datestr = date.toString();
+        TimeSlot result = AppointmentScheduler.ChooseTime(stylist_id, datestr, service_id);
+        LocalTime time_start = result.getStart();
+        LocalTime time_end = result.getEnd();
+        boolean successfulBooking = SQL_CON.INSTERT_Appointment(userId, salon_id, stylist_id, service_id, datestr, time_start.withSecond(0), connection);
+        AppointmentScheduler.isValidAppointment(successfulBooking, userId, stylist_id, salon_id, service_id, connection);
+        SQL_CON.insertAvailability(stylist_id, datestr, time_start.withSecond(0), time_end.withSecond(0), connection);
+        SQL_CON.removeAvailability(stylist_id, datestr, time_start.withSecond(0), time_end.withSecond(0), connection);
+        
         try {
-            SQL_CON.showSalons(connection);
-            int salon_id = AppointmentScheduler.chooseSalon();
-            SQL_CON.showStylists(connection, salon_id);
-            int stylist_id = AppointmentScheduler.chooseStylist();
-            SQL_CON.showServices(connection);
-            int service_id = AppointmentScheduler.chooseService(connection);
-            LocalDate date = AppointmentScheduler.ChooseDate();
-
-            AppointmentScheduler scheduler = new AppointmentScheduler();
-            scheduler.runScheduler(); 
+            TimeSlot timemanager = new TimeSlot(DB_URL);
+            timemanager.removeBookedTimeSlot(stylist_id, datestr, time_start.withSecond(0), time_end.withSecond(0), connection);
+            timemanager.close();
         } catch (SQLException e) {
-            System.out.println("Error initializing Appointment Scheduler: " + e.getMessage());
+            System.out.println("Database error during booking: " + e.getMessage());
         }
     }
+
+
+           
+    
 
     private static void showLatestAppointment(Connection connection, int userId) {
         String query = "SELECT A.appointment_id, A.date, A.time_start, S.name AS salon_name, SR.service " +
@@ -263,4 +281,5 @@ public class HairhubApp {
             System.out.println("Error fetching latest appointment: " + e.getMessage());
         }
     }
+
 }

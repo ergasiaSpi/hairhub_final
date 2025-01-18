@@ -1,6 +1,7 @@
 package com.hairhub.sign_in_up;
 
 import java.sql.*;
+import java.time.LocalTime;
 
 public class SQL_CON {
 
@@ -192,8 +193,72 @@ public class SQL_CON {
         }
     }
 
+      public static boolean INSTERT_Appointment(int userId, int salonId, int stylistId, int serviceId, 
+                                   String date, LocalTime timeStart, Connection connection) {
+        String query = "INSERT INTO Appointments (user_id, salon_id, stylist_id, service_id, date, time_start) " +
+                       "VALUES (?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, userId);
+            stmt.setInt(2, salonId);
+            stmt.setInt(3, stylistId);
+            stmt.setInt(4, serviceId);
+            stmt.setString(5, date);
+            stmt.setString(6, timeStart.toString());
+            int rowsInserted = stmt.executeUpdate();
+            return rowsInserted > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
+    public static void insertAvailability(int stylistId, String appointDate, LocalTime timeStart, LocalTime timeEnd, Connection connection) {
+        String insertQuery = "INSERT INTO AvailabilitybyStylist (stylist_id, appoint_date, time_start, time_end) "
+                           + "VALUES (?, ?, ?, ?);";
 
+        try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery))
+              {
+
+            // Ορισμός των τιμών για τα ερωτηματικά (?)
+            preparedStatement.setInt(1, stylistId);
+            preparedStatement.setString(2, appointDate);
+            preparedStatement.setString(3, timeStart.toString());
+            preparedStatement.setString(4, timeEnd.toString());
+
+            // Εκτέλεση της εντολής INSERT
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+               return;
+            } else {
+                System.out.println("Failed to insert availability.");
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Database error: " + e.getMessage());
+        }
+    }
+
+    public static void removeAvailability(int stylistId, String appointDate, LocalTime timeStart, LocalTime timeEnd, Connection connection) {
+        String deleteQuery = "DELETE FROM AvailabilitybyStylist " +
+                             "WHERE stylist_id = ? AND appoint_date = ? AND time_start = ? AND time_end = ?";
+
+        try (PreparedStatement deleteStmt = connection.prepareStatement(deleteQuery)) {
+
+            deleteStmt.setInt(1, stylistId);
+            deleteStmt.setString(2, appointDate);
+            deleteStmt.setTime(3, Time.valueOf(timeStart));
+            deleteStmt.setTime(4, Time.valueOf(timeEnd));
+
+            int rowsAffected = deleteStmt.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Availability removed successfully for the booked slot.");
+            } else {
+                System.out.println("No availability was found for the specified details.");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error removing availability: " + e.getMessage());
+        }
+    }
 
     public static void viewAppointmentsByAdmin(int adminId) {
         String query = """
