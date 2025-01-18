@@ -78,7 +78,7 @@ public class HairhubApp {
 
 <<<<<<< HEAD
     private static void signUpProcess(Connection connection, Scanner scanner) throws SQLException{
-        // Assuming you will add the logic for sign up
+        
 =======
     private static void signUpProcess(Connection connection, Scanner scanner) {
         
