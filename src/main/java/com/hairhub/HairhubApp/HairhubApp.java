@@ -4,8 +4,7 @@ import com.hairhub.sign_in_up.UserSessionManager;
 import com.hairhub.Admin.*;
 import com.hairhub.sign_in_up.SQL_CON;
 import com.hairhub.sign_in_up.UserInput;
-import com.hairhub.Admin.Admin_insert;
-import com.hairhub.BookAnAppointment.AppointmentScheduler;
+import com.hairhub.BookAnAppointment.*;
 import com.hairhub.BookAnAppointment.TimeSlot;
 
 import java.time.LocalDate;
@@ -76,13 +75,8 @@ public class HairhubApp {
         }
     }
 
-<<<<<<< HEAD
     private static void signUpProcess(Connection connection, Scanner scanner) throws SQLException{
         // Assuming you will add the logic for sign up
-=======
-    private static void signUpProcess(Connection connection, Scanner scanner) {
-        
->>>>>>> d71e3145a1d7915c6f0edf40d00aa03b2720f664
         System.out.println("Please sign up.");
         String username = UserInput.Get_Username(true);
         String password = UserInput.Get_Password();
@@ -123,8 +117,6 @@ public class HairhubApp {
             } else if (userRole.equals("customer")) {
                 showCustomerMenu(scanner, connection, userId);
             }
-
-            
         }
     
 
@@ -226,15 +218,16 @@ public class HairhubApp {
         }
     }
 
-    private static void bookAppointment(Connection connection, int userId) {
+    public static void bookAppointment(Connection connection, int userId) {
         SQL_CON.showSalons(connection);
         int salon_id = AppointmentScheduler.chooseSalon();
         SQL_CON.showStylists(connection, salon_id);
         int stylist_id = AppointmentScheduler.chooseStylist();
-        SQL_CON.showServices(connection);
-        int service_id = AppointmentScheduler.chooseService(connection);
         LocalDate date = AppointmentScheduler.ChooseDate();
         String datestr = date.toString();
+        Discount.applyDiscount(stylist_id, datestr, connection);
+        SQL_CON.showServices(stylist_id, connection);
+        int service_id = AppointmentScheduler.chooseService(connection);
         TimeSlot result = AppointmentScheduler.ChooseTime(stylist_id, datestr, service_id);
         LocalTime time_start = result.getStart();
         LocalTime time_end = result.getEnd();

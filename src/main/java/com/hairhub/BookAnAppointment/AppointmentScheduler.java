@@ -431,11 +431,5 @@ public class AppointmentScheduler {
     }
 
 
-
-
-
-
-
-    // Method to run the appointment scheduler
 }
         

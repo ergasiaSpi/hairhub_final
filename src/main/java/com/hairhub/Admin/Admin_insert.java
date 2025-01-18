@@ -2,9 +2,9 @@ package com.hairhub.Admin;
 
 import java.util.Scanner;
 
-import com.hairhub.HairhubApp.HairhubApp;
+
 import com.hairhub.sign_in_up.Constrictions;
-import com.hairhub.sign_in_up.UserInput;
+
 import com.hairhub.sign_in_up.UserSessionManager;
 
 import java.sql.*;

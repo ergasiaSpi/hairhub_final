@@ -141,8 +141,8 @@ public class SQL_CON {
                 int stylistId = resultSet.getInt("stylist_id");
                 String stylistName = resultSet.getString("stylist_name");
                 String specializations = resultSet.getString("specializations");
-                Time shiftStart = resultSet.getTime("shift_start");
-                Time shiftEnd = resultSet.getTime("shift_end");
+                String shiftStart = resultSet.getString("shift_start");
+                String shiftEnd = resultSet.getString("shift_end");
 
                 // Εμφανίζουμε τις πληροφορίες του κάθε stylist
                 System.out.println("Stylist ID: " + stylistId);
@@ -158,40 +158,41 @@ public class SQL_CON {
         }
     }
 
-    // Μέθοδος για να εμφανίζει όλες τις διαθέσιμες υπηρεσίες
-    public static void showServices(Connection connection) {
-        // SQL query για να πάρουμε όλες τις υπηρεσίες από τον πίνακα Services
-        String query = "SELECT service_id, service, price, duration FROM Services";
 
+    public static void showServices(int stylistId, Connection connection) {
+        // Ερώτηση SQL για να φιλτράρει μόνο τις υπηρεσίες του συγκεκριμένου κομμωτή
+        String query = "SELECT service_id, service, price, duration, discounted_price FROM Services WHERE stylist_id = ?";
+    
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            ResultSet resultSet = stmt.executeQuery();  // Εκτελούμε το query
-
-            // Αν δεν υπάρχουν υπηρεσίες
+            stmt.setInt(1, stylistId);  // Ρύθμιση του stylistId στο prepared statement
+            ResultSet resultSet = stmt.executeQuery();  
+    
             if (!resultSet.next()) {
-                System.out.println("No services available.");
+                System.out.println("No services available for the selected stylist.");
                 return;
             }
-
-            // Εμφανίζουμε τις υπηρεσίες
-            System.out.println("Available services:");
+    
+            System.out.println("Available services for Stylist ID " + stylistId + ":");
             do {
                 int serviceId = resultSet.getInt("service_id");
                 String serviceName = resultSet.getString("service");
                 double price = resultSet.getDouble("price");
-                Time duration = resultSet.getTime("duration");
-
-                // Εμφανίζουμε τις πληροφορίες για κάθε υπηρεσία
+                String duration = resultSet.getString("duration");
+                String discountedPrice = resultSet.getString("discounted_price");
+    
                 System.out.println("Service ID: " + serviceId);
                 System.out.println("Service Name: " + serviceName);
                 System.out.println("Price: " + price + " EUR");
                 System.out.println("Duration: " + duration);
+                System.out.println("Discounted price: " + discountedPrice);
                 System.out.println("------------------------");
-            } while (resultSet.next());  // Συνεχίζουμε μέχρι να τελειώσουν όλες οι υπηρεσίες
-
+            } while (resultSet.next());  
+    
         } catch (SQLException e) {
             System.out.println("Error fetching services: " + e.getMessage());
         }
     }
+    
 
       public static boolean INSTERT_Appointment(int userId, int salonId, int stylistId, int serviceId, 
                                    String date, LocalTime timeStart, Connection connection) {
