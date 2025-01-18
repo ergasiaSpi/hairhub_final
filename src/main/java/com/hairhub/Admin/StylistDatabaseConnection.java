@@ -4,7 +4,7 @@ package com.hairhub.Admin;
 import java.sql.*;
 public class StylistDatabaseConnection {
     String DB_URL = "jdbc:sqlite:C:\\Users\\n" + //
-                "ikol\\Documents\\GitHub\\hairhub_final\\hairhub.db"; // πλήρης διαδρομή
+                "ikol\\Documents\\GitHub\\hairhub_final\\hairhub.db"; 
 
 
      

@@ -2,14 +2,13 @@ package com.hairhub.Admin;
 
 public class Service {
 
-    // Ιδιότητες της κλάσης
-    private int id;              // Μοναδικό ID της υπηρεσίας
-    private String name;         // Όνομα υπηρεσίας
-    private String description;  // Περιγραφή υπηρεσίας
-    private double price;        // Τιμή υπηρεσίας
-    private int duration;        // Διάρκεια σε λεπτά
+    private int id;              
+    private String name;         
+    private String description;  
+    private double price;       
+    private int duration;        
 
-    // Κατασκευαστής
+
     public Service(int id, String name, String description, double price, int duration) {
         this.id = id;
         this.name = name;
@@ -18,7 +17,7 @@ public class Service {
         this.duration = duration;
     }
 
-    // Getters
+   
     public int getId() {
         return id;
     }
@@ -60,7 +59,7 @@ public class Service {
         this.duration = duration;
     }
 
-    // Μέθοδος για εμφάνιση της υπηρεσίας ως string
+    
     @Override
     public String toString() {
         return "Service{" +

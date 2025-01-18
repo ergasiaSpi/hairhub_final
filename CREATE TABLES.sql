@@ -1,7 +1,7 @@
--- Ενεργοποίηση Foreign Key Constraints
+ 
 PRAGMA foreign_keys = ON;
 
--- Δημιουργία πίνακα Location
+ 
 CREATE TABLE Location (
     zipcode TEXT PRIMARY KEY,
     territory TEXT NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE Location (
     latitude REAL NOT NULL
 );
 
--- Δημιουργία πίνακα Users
+ 
 CREATE TABLE Users (
     user_id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE Users (
     role TEXT CHECK (role IN ('admin', 'customer'))
 );
 
--- Δημιουργία πίνακα Salons
+ 
 CREATE TABLE Salons (
     salon_id INTEGER PRIMARY KEY AUTOINCREMENT,
     admin_id INTEGER NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE Salons (
     FOREIGN KEY (zipcode) REFERENCES Location(zipcode) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Δημιουργία πίνακα Stylists
+ 
 CREATE TABLE Stylists (
     stylist_id INTEGER PRIMARY KEY AUTOINCREMENT,
     stylist_name TEXT NOT NULL,
@@ -43,7 +43,7 @@ CREATE TABLE Stylists (
     FOREIGN KEY (salon_id) REFERENCES Salons(salon_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Δημιουργία πίνακα Services
+ 
 CREATE TABLE Services (
     service_id INTEGER PRIMARY KEY AUTOINCREMENT,
     stylist_id INTEGER NOT NULL,
@@ -54,7 +54,7 @@ CREATE TABLE Services (
     FOREIGN KEY (stylist_id) REFERENCES Stylists(stylist_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Δημιουργία πίνακα AvailabilitybyStylist
+ 
 CREATE TABLE AvailabilitybyStylist (
     availability_id INTEGER PRIMARY KEY AUTOINCREMENT,
     stylist_id INTEGER NOT NULL,
@@ -65,7 +65,7 @@ CREATE TABLE AvailabilitybyStylist (
     UNIQUE (stylist_id, appoint_date, time_start)
 );
 
--- Δημιουργία πίνακα Appointments
+ 
 CREATE TABLE Appointments (
     appointment_id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,

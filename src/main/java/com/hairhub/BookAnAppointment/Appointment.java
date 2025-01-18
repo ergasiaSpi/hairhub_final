@@ -15,7 +15,7 @@ public class Appointment {
     private Time timeStart;
     private String status;
 
-    // SQLite database path (use your actual path here)
+    
     private static final String DB_SERVER = "jdbc:sqlite:/path/to/your/database.db";
 
     public Appointment() {
@@ -42,7 +42,7 @@ public class Appointment {
         this.status = status;
     }
 
-    // Getters and setters...
+    
     public int getAppointmentId() {
         return appointmentId;
     }
@@ -107,7 +107,7 @@ public class Appointment {
         this.status = status;
     }
 
-    // Insert a new appointment into the database
+
     public Appointment insertNewAppointment(Appointment appointment) throws SQLException {
 
         try (Connection conn = DriverManager.getConnection(DB_SERVER)) {
@@ -133,7 +133,7 @@ public class Appointment {
         return null;
     }
 
-    // Search for an appointment by its ID
+   
     public static Appointment searchAppointmentById(int id) throws SQLException {
 
         try (Connection conn = DriverManager.getConnection(DB_SERVER)) {
@@ -160,7 +160,7 @@ public class Appointment {
         return null;
     }
 
-    // Update an existing appointment
+  
     public boolean updateAppointment(Appointment appointment) throws SQLException {
 
         try (Connection conn = DriverManager.getConnection(DB_SERVER)) {
@@ -182,7 +182,6 @@ public class Appointment {
         return false;
     }
 
-    // Delete an appointment from the database
     public boolean deleteAppointment(Appointment appointment) throws SQLException {
 
         try (Connection conn = DriverManager.getConnection(DB_SERVER)) {
@@ -197,7 +196,7 @@ public class Appointment {
         return false;
     }
 
-    // List all appointments
+   
     public static List<Appointment> listAppointments() throws SQLException {
 
         List<Appointment> appointments = new ArrayList<>();

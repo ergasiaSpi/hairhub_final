@@ -11,7 +11,6 @@ import java.util.List;
 public class ServiceDao {
     private static final String DB_URL = "jdbc:sqlite:/path/to/your/database.db";
 
-    // Method to add a service
     public void addService(Service service) {
         String query = "INSERT INTO Services (id, name, description, price, duration) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DriverManager.getConnection(DB_URL);
@@ -27,7 +26,7 @@ public class ServiceDao {
         }
     }
 
-    // Method to retrieve all services
+  
     public List<Service> getAllServices() {
         List<Service> services = new ArrayList<>();
         String query = "SELECT * FROM Services";
@@ -49,7 +48,7 @@ public class ServiceDao {
         return services;
     }
 
-    // Method to update a service
+   
     public void updateService(Service service) {
         String query = "UPDATE Services SET name = ?, description = ?, price = ?, duration = ? WHERE id = ?";
         try (Connection conn = DriverManager.getConnection(DB_URL);
@@ -65,7 +64,7 @@ public class ServiceDao {
         }
     }
 
-    // Method to delete a service by ID
+   
     public void deleteService(int serviceId) {
         String query = "DELETE FROM Services WHERE id = ?";
         try (Connection conn = DriverManager.getConnection(DB_URL);
@@ -77,7 +76,7 @@ public class ServiceDao {
         }
     }
 
-    // Method to retrieve a service by ID
+  
     public Service getServiceById(int serviceId) {
         String query = "SELECT * FROM Services WHERE id = ?";
         try (Connection conn = DriverManager.getConnection(DB_URL);

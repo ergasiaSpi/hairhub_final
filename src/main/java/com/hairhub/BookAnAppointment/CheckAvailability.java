@@ -60,16 +60,16 @@ public class CheckAvailability {
             throw new SQLException("Service type not found");
         }
 
-        // Διασφαλίζουμε ότι το duration έχει πάντα τη μορφή HH:mm:ss
+         
         String durationString = serviceResult.getString("duration");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
-        // Αν το duration είναι στην μορφή HH:mm (χωρίς δευτερόλεπτα), προσθέτουμε τα δευτερόλεπτα ως 00
-        if (durationString.length() == 5) {  // Αν η μορφή είναι HH:mm
-            durationString += ":00";  // Προσθήκη των δευτερολέπτων
+        
+        if (durationString.length() == 5) {   
+            durationString += ":00";  
         }
 
-        return LocalTime.parse(durationString, formatter);  // Μετατροπή σε LocalTime με την σωστή μορφή
+        return LocalTime.parse(durationString, formatter);  
     }
 }
 

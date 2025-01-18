@@ -9,8 +9,8 @@ public class SQL_CON {
         
         String Query = "INSERT INTO Users (username, user_password, email, phone, postal_code, role) VALUES (?, ?, ?, ?, ?, ?)";
         
-        // Σύνδεση με SQLite και εκτέλεση του INSERT query
-        try (Connection myCon = DriverManager.getConnection("jdbc:sqlite:hairhub.db");  // Σύνδεση με SQLite
+        
+        try (Connection myCon = DriverManager.getConnection("jdbc:sqlite:hairhub.db");   
              PreparedStatement pstmt = myCon.prepareStatement(Query);) {
             
             pstmt.setString(1, Username);
@@ -32,15 +32,15 @@ public class SQL_CON {
 
         String Query = "SELECT * FROM Users WHERE username = ? AND user_password = ?";
         
-        // Σύνδεση με SQLite και εκτέλεση του SELECT query
-        try (Connection myCon = DriverManager.getConnection("jdbc:sqlite:hairhub.db");  // Σύνδεση με SQLite
+       
+        try (Connection myCon = DriverManager.getConnection("jdbc:sqlite:hairhub.db");   
              PreparedStatement pstmt = myCon.prepareStatement(Query);) {
             
             pstmt.setString(1, Username);
             pstmt.setString(2, Password);
             ResultSet result = pstmt.executeQuery();
             
-            if (result.next()) {  // Αν υπάρχει τουλάχιστον μια εγγραφή
+            if (result.next()) {   
                 System.out.println("Welcome: " + Username);
                 return true;
             } else {
@@ -82,7 +82,7 @@ public class SQL_CON {
         }
     }
 
-    // Μέθοδος για εμφάνιση των κομμωτηρίων
+  
     public static void showSalons(Connection connection) {
         String query = "SELECT salon_id, name, address, phone_number, email FROM Salons";
 
@@ -92,11 +92,11 @@ public class SQL_CON {
             System.out.println("List of Salons:");
             System.out.println("--------------------------------------------------");
 
-            // Έλεγχος αν υπάρχουν αποτελέσματα
+            
             if (!rs.isBeforeFirst()) {
                 System.out.println("No salons found.");
             } else {
-                // Εμφάνιση των αποτελεσμάτων
+                 
                 while (rs.next()) {
                     int salonId = rs.getInt("salon_id");
                     String name = rs.getString("name");
@@ -121,21 +121,21 @@ public class SQL_CON {
     }
 
     public static void showStylists(Connection connection, int salonId) {
-        // SQL query για να πάρουμε τους stylists για το συγκεκριμένο salon
+        
         String query = "SELECT stylist_id, stylist_name, specializations, shift_start, shift_end " +
                        "FROM Stylists WHERE salon_id = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, salonId);  // Ορίζουμε το salon_id στην prepared statement
-            ResultSet resultSet = stmt.executeQuery();  // Εκτελούμε το query
+            stmt.setInt(1, salonId);  
+            ResultSet resultSet = stmt.executeQuery();   
 
-            // Αν δεν υπάρχουν stylists για το συγκεκριμένο salon
+             
             if (!resultSet.next()) {
                 System.out.println("No stylists found for this salon.");
                 return;
             }
 
-            // Εμφανίζουμε τους stylists
+             
             System.out.println("Stylists for salon with ID " + salonId + ":");
             do {
                 int stylistId = resultSet.getInt("stylist_id");
@@ -151,8 +151,7 @@ public class SQL_CON {
                 System.out.println("Shift Start: " + shiftStart);
                 System.out.println("Shift End: " + shiftEnd);
                 System.out.println("------------------------");
-            } while (resultSet.next());  // Συνεχίζουμε μέχρι να τελειώσουν όλοι οι stylists
-
+            } while (resultSet.next()); 
         } catch (SQLException e) {
             System.out.println("Error fetching stylists: " + e.getMessage());
         }
@@ -220,13 +219,13 @@ public class SQL_CON {
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery))
               {
 
-            // Ορισμός των τιμών για τα ερωτηματικά (?)
+          
             preparedStatement.setInt(1, stylistId);
             preparedStatement.setString(2, appointDate);
             preparedStatement.setString(3, timeStart.toString());
             preparedStatement.setString(4, timeEnd.toString());
 
-            // Εκτέλεση της εντολής INSERT
+             
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
                return;

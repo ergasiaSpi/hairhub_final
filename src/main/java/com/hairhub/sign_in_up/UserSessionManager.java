@@ -12,19 +12,19 @@ public class UserSessionManager {
         System.out.println("User with ID " + userId + " is signed in.");
     }
 
-    // Method to sign out a user
+   
     public static void signOutUser() {
         isUserSignedIn = false;
         signedInUserId = -1;
         System.out.println("User signed out.");
     }
 
-    // Method to check if a user is signed in
+     
     public static boolean isUserSignedIn() {
         return isUserSignedIn;
     }
 
-    // Method to get the currently signed-in user's ID
+    
     public static int getSignedInUserId() {
         if (isUserSignedIn) {
             return signedInUserId;
