@@ -220,6 +220,7 @@ public class HairhubApp {
             }    
            
     }
+}
 
 
            
@@ -251,3 +252,4 @@ public class HairhubApp {
         }
     }
 }
+
