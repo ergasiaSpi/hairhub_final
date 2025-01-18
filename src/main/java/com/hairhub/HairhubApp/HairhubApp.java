@@ -4,8 +4,10 @@ import com.hairhub.sign_in_up.UserSessionManager;
 import com.hairhub.sign_in_up.SQL_CON;
 import com.hairhub.sign_in_up.UserInput;
 import com.hairhub.BookAnAppointment.AppointmentScheduler;
-import java.time.LocalDate;
+import com.hairhub.BookAnAppointment.TimeSlot;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.sql.*;
 import java.util.Scanner;
 
@@ -234,23 +236,27 @@ public class HairhubApp {
                        "JOIN Services SR ON A.service_id = SR.service_id " +
                        "WHERE A.user_id = ? " +
                        "ORDER BY A.date DESC, A.time_start DESC LIMIT 1";
-
+    
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setInt(1, userId);
             ResultSet resultSet = pstmt.executeQuery();
-
+    
             if (resultSet.next()) {
-                System.out.printf("Appointment ID: %d%n", resultSet.getInt("appointment_id"));
-                System.out.printf("Date: %s%n", resultSet.getString("date"));
-                System.out.printf("Time: %s%n", resultSet.getString("time_start"));
-                System.out.printf("Salon: %s%n", resultSet.getString("salon_name"));
-                System.out.printf("Service: %s%n", resultSet.getString("service"));
+                
+                int appointmentId = resultSet.getInt("appointment_id");
+                LocalDate date = resultSet.getDate("date").toLocalDate();
+                LocalTime timeStart = resultSet.getTime("time_start").toLocalTime();
+                String salonName = resultSet.getString("salon_name");
+                String service = resultSet.getString("service");
+    
             } else {
                 System.out.println("No appointments found.");
             }
         } catch (SQLException e) {
             System.out.println("Error fetching latest appointment: " + e.getMessage());
+            e.printStackTrace();
         }
     }
-}
 
+}
+}
