@@ -18,7 +18,7 @@ CREATE TABLE Salons (
     admin_id INTEGER NOT NULL,
     name TEXT NOT NULL,
     address TEXT NOT NULL,
-    zipcode TEXT NOT NULL,
+    postal_code TEXT NOT NULL,
     phone_number TEXT NOT NULL,
     email TEXT,
     FOREIGN KEY (zipcode) REFERENCES Location(zipcode) ON DELETE CASCADE ON UPDATE CASCADE
